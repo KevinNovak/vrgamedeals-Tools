@@ -5,7 +5,7 @@ async function retrieveGameData() {
     let pageResultsDiv = document.getElementById('page-results');
 
     retrievePageButton.disabled = true;
-    pageResultsDiv.innerHTML = "Loading...";
+    pageResultsDiv.innerHTML = "Retrieving...";
 
     let steamAppIdInput = document.getElementById('steam-app-id');
     let steamAppIdString = steamAppIdInput.value;
@@ -75,7 +75,7 @@ async function retrieveSearchData() {
     let retrieveSearchButton = document.getElementById('retrieve-search-button');
 
     retrieveSearchButton.disabled = true;
-    searchResultsDiv.innerHTML = "Loading...";
+    searchResultsDiv.innerHTML = "Retrieving...";
 
     let steamQueryInput = document.getElementById('steam-query');
     let steamQueryInputString = steamQueryInput.value;
