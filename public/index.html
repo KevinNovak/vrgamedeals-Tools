@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>r/vrgamedeals Tools</title>
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/flatly/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T5jhQKMh96HMkXwqVMSjF3CmLcL1nT9//tCqu9By5XSdj7CwR0r+F3LTzUdfkkQf"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./styles/default.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <h1 class="mt-3">
+            <a href="https://www.reddit.com/r/vrgamedeals/" target="_blank"
+              >r/vrgamedeals</a
+            >
+            Tools
+          </h1>
+
+          <hr />
+
+          <div class="module">
+            <h3>Steam Page Scraper</h3>
+            <h5>
+              Scrapes the provided Steam page and returns a formatted title.
+            </h5>
+            <label for="steam-app-id"><b>Steam App ID</b></label>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon3"
+                  >https://store.steampowered.com/app/</span
+                >
+              </div>
+              <input
+                id="steam-app-id"
+                type="number"
+                class="form-control"
+                placeholder="450390"
+              />
+              <div class="input-group-append">
+                <button
+                  id="retrieve-page-button"
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  onclick="retrieveGameData()"
+                >
+                  Retrieve
+                </button>
+              </div>
+            </div>
+            <div id="page-results">
+              <span>No results.</span>
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="module">
+            <h3>Steam Search Scraper</h3>
+            <h5>
+              Scrapes the provided Steam search and returns a formatted markdown
+              table.
+            </h5>
+            <h6><i>Only includes VR-supported games which are currently discounted.</i></h6>
+            <label for="steam-app-id"><b>Steam Search Query</b></label>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon3"
+                  >https://store.steampowered.com/search/?vrsupport=401,402&specials=1&</span
+                >
+              </div>
+              <input
+                id="steam-query"
+                type="text"
+                class="form-control"
+                placeholder="filter=weeklongdeals"
+              />
+              <div class="input-group-append">
+                <button
+                  id="retrieve-search-button"
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  onclick="retrieveSearchData()"
+                >
+                  Retrieve
+                </button>
+              </div>
+            </div>
+            <div id="search-results">
+              <span>No results.</span>
+            </div>
+          </div>
+
+          <hr />
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+    <script src="./scripts/index.js"></script>
+  </body>
+</html>
