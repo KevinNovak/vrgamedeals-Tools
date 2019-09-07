@@ -7,7 +7,7 @@ const TITLE_REMOVE = [
     'Play'
 ];
 const STEAM_APP_URL = 'https://store.steampowered.com/app/{{APP_ID}}';
-const STEAM_SEARCH_URL = 'https://store.steampowered.com/search/?vrsupport=401,402&specials=1&{{QUERY}}'
+const STEAM_SEARCH_URL = 'https://store.steampowered.com/search/?vrsupport=402&specials=1&{{QUERY}}'
 
 const APP_ID_URL_REGEX = /\/app\/(\d+)\//i;
 
