@@ -12,8 +12,7 @@ const STEAM_APP_URL = 'https://store.steampowered.com/app/{{APP_ID}}';
 const STEAM_SEARCH_URL = 'https://store.steampowered.com/search/?{{QUERY}}'
 
 const APP_ID_URL_REGEX = /\/app\/(\d+)\//i;
-const PERCENT_NUMBER_REGEX = /(\d+)%/;
-const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
+const PERCENT_REGEX = /(\d+%)/;
 
 async function getAppPageData(appId) {
     let appUrl = STEAM_APP_URL.replace('{{APP_ID}}', appId);
@@ -67,15 +66,8 @@ function extractAppIdFromUrl(input) {
     }
 }
 
-function extractNumberFromPercent(input) {
-    let match = PERCENT_NUMBER_REGEX.exec(input);
-    if (match) {
-        return match[1];
-    }
-}
-
-function extractNumberFromPrice(input) {
-    let match = PRICE_NUMBER_REGEX.exec(input);
+function extractPercent(input) {
+    let match = PERCENT_REGEX.exec(input);
     if (match) {
         return match[1];
     }
@@ -112,23 +104,13 @@ function getGameData($, firstGame) {
         originalPrice = $('.discount_original_price', firstGame).text().trim();
         discountPrice = $('.discount_final_price', firstGame).text().trim();
         percentOff = $('.discount_pct', firstGame).text().trim();
-        let percentOffNumber = extractNumberFromPercent(percentOff);
-        if (percentOffNumber) {
-            percentOff = percentOffNumber;
+        let percentOffExtracted = extractPercent(percentOff);
+        if (percentOffExtracted) {
+            percentOff = percentOffExtracted;
         }
     }
     else {
         originalPrice = $('.game_purchase_price', firstGame).text().trim();
-    }
-
-    let originalPriceNumber = extractNumberFromPrice(originalPrice);
-    if (originalPriceNumber) {
-        originalPrice = originalPriceNumber;
-    }
-
-    let discountPriceNumber = extractNumberFromPrice(discountPrice);
-    if (discountPriceNumber) {
-        discountPrice = discountPriceNumber;
     }
 
     return {

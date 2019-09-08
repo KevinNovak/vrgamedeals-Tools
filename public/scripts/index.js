@@ -1,4 +1,6 @@
 const NEW_LINE = '&#10';
+const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
+const PERCENT_NUMBER_REGEX = /(\d+)%/;
 
 async function retrieveGameData() {
     let retrievePageButton = document.getElementById('retrieve-page-button');
@@ -26,15 +28,15 @@ async function retrieveGameData() {
         if (isVr) {
             let platforms = getPlatformText(body.headsets);
             if (discounted) {
-                link.innerText = `[${platforms}] ${body.title} ($${body.discountPrice} / ${body.percentOff}% off)`;
+                link.innerText = `[${platforms}] ${body.title} (${body.discountPrice} / ${body.percentOff} off)`;
             } else {
-                link.innerText = `[${platforms}] ${body.title} ($${body.originalPrice})`;
+                link.innerText = `[${platforms}] ${body.title} (${body.originalPrice})`;
             }
         } else {
             if (discounted) {
-                link.innerText = `${body.title} ($${body.discountPrice} / ${body.percentOff}% off)`;
+                link.innerText = `${body.title} (${body.discountPrice} / ${body.percentOff} off)`;
             } else {
-                link.innerText = `${body.title} ($${body.originalPrice})`;
+                link.innerText = `${body.title} (${body.originalPrice})`;
             }
         }
         link.href = body.url;
@@ -105,13 +107,39 @@ function createMarkdownTable(gamesData) {
     for (game of gamesData) {
         let platform = game.headsets.map(platform => getHeadsetAbbreviation(platform)).join('/');
         let price = game.discounted ? game.discountPrice : game.originalPrice;
-        result += `| ${platform} | [${escapePipes(game.title)}](${game.url}) | ${price} | ${game.percentOff} |` + NEW_LINE;
+
+        let priceNumber = extractNumberFromPrice(price);
+        if (priceNumber) {
+            price = priceNumber;
+        }
+
+        let percentOff = game.percentOff;
+        let percentOffNumber = extractNumberFromPercent(percentOff);
+        if (percentOffNumber) {
+            percentOff = percentOffNumber;
+        }
+
+        result += `| ${platform} | [${escapePipes(game.title)}](${game.url}) | ${price} | ${percentOff} |` + NEW_LINE;
     }
     return result;
 }
 
 function escapePipes(input) {
     return input.replace('|', '‖');
+}
+
+function extractNumberFromPrice(input) {
+    let match = PRICE_NUMBER_REGEX.exec(input);
+    if (match) {
+        return match[1];
+    }
+}
+
+function extractNumberFromPercent(input) {
+    let match = PERCENT_NUMBER_REGEX.exec(input);
+    if (match) {
+        return match[1];
+    }
 }
 
 function getPlatformText(platforms) {
