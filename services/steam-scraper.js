@@ -4,10 +4,11 @@ const _rp = require('request-promise');
 const PERCENT_OFF_REMOVE = '-';
 const TITLE_REMOVE = [
     'Buy',
-    'Play'
+    'Play',
+    'Download'
 ];
 const STEAM_APP_URL = 'https://store.steampowered.com/app/{{APP_ID}}';
-const STEAM_SEARCH_URL = 'https://store.steampowered.com/search/?vrsupport=402&specials=1&{{QUERY}}'
+const STEAM_SEARCH_URL = 'https://store.steampowered.com/search/?{{QUERY}}'
 
 const APP_ID_URL_REGEX = /\/app\/(\d+)\//i;
 

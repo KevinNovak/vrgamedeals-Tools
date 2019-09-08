@@ -155,24 +155,18 @@
               Scrapes the provided Steam search and returns a formatted markdown
               table.
             </h5>
-            <h6>
-              <i
-                >Only includes VR-supported games which are currently
-                discounted.</i
-              >
-            </h6>
             <label for="steam-app-id"><b>Steam Search Query</b></label>
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon3"
-                  >https://store.steampowered.com/search/?vrsupport=402&specials=1&</span
+                  >https://store.steampowered.com/search/?</span
                 >
               </div>
               <input
                 id="steam-query"
                 type="text"
                 class="form-control"
-                placeholder="filter=weeklongdeals"
+                placeholder="vrsupport=402&filter=weeklongdeals"
               />
               <div class="input-group-append">
                 <button

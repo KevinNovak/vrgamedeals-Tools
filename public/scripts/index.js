@@ -105,9 +105,14 @@ function createMarkdownTable(gamesData) {
     let result = header + NEW_LINE + divider + NEW_LINE;
     for (game of gamesData) {
         let platform = game.headsets.map(platform => getHeadsetAbbreviation(platform)).join('/');
-        result += `| ${platform} | [${game.title}](${game.url}) | ${game.discountPrice} | ${game.percentOff} |` + NEW_LINE;
+        let price = game.discounted ? game.discountPrice : game.originalPrice;
+        result += `| ${platform} | [${escapePipes(game.title)}](${game.url}) | ${price} | ${game.percentOff} |` + NEW_LINE;
     }
     return result;
+}
+
+function escapePipes(input) {
+    return input.replace('|', '‖');
 }
 
 function getPlatformText(platforms) {
