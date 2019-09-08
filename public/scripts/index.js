@@ -64,6 +64,10 @@ const headsetAliases = {
         shortName: 'Rift',
         abbreviation: 'R'
     },
+    'Oculus Rift DK2': {
+        shortName: 'Rift DK2',
+        abbreviation: 'DK2'
+    },
     'Windows Mixed Reality': {
         shortName: 'WMR',
         abbreviation: 'W'
