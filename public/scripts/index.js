@@ -78,7 +78,7 @@ async function retrieveSearchData() {
     searchResultsDiv.innerHTML = "Retrieving...";
 
     let steamQueryInput = document.getElementById('steam-query');
-    let steamQueryInputString = steamQueryInput.value;
+    let steamQueryInputString = steamQueryInput.value.trim();
     if (!steamQueryInputString) {
         retrieveSearchButton.disabled = false;
         searchResultsDiv.innerHTML = "No results.";
