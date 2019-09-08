@@ -12,6 +12,7 @@ const STEAM_SEARCH_URL = 'https://store.steampowered.com/search/?{{QUERY}}'
 
 const APP_ID_URL_REGEX = /\/app\/(\d+)\//i;
 const PERCENT_NUMBER_REGEX = /(\d+)%/;
+const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
 
 async function getAppPageData(appId) {
     let appUrl = STEAM_APP_URL.replace('{{APP_ID}}', appId);
@@ -72,6 +73,13 @@ function extractNumberFromPercent(input) {
     }
 }
 
+function extractNumberFromPrice(input) {
+    let match = PRICE_NUMBER_REGEX.exec(input);
+    if (match) {
+        return match[1];
+    }
+}
+
 function getHeadsets($) {
     let headsetTitleElement = $('.details_block.vrsupport > div:contains("Headsets")').parent();
     let headsetElements = Array.from(headsetTitleElement.nextUntil('.details_block'));
@@ -111,6 +119,17 @@ function getGameData($, firstGame) {
     else {
         originalPrice = $('.game_purchase_price', firstGame).text().trim();
     }
+
+    let originalPriceNumber = extractNumberFromPrice(originalPrice);
+    if (originalPriceNumber) {
+        originalPrice = originalPriceNumber;
+    }
+
+    let discountPriceNumber = extractNumberFromPrice(discountPrice);
+    if (discountPriceNumber) {
+        discountPrice = discountPriceNumber;
+    }
+
     return {
         title,
         originalPrice,
