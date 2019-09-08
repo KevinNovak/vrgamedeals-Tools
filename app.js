@@ -16,7 +16,7 @@ function main() {
         res.json(gamePageData);
     });
 
-    _app.get('/api/search/', async (req, res) => {
+    _app.get('/api/search', async (req, res) => {
         let query = "";
         let searchPageData = await _steamScraper.getSearchPageData(query);
         res.json(searchPageData);
