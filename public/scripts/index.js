@@ -83,11 +83,6 @@ async function retrieveSearchData() {
 
     let steamQueryInput = document.getElementById('steam-query');
     let steamQueryInputString = steamQueryInput.value.trim();
-    if (!steamQueryInputString) {
-        retrieveSearchButton.disabled = false;
-        searchResultsDiv.innerHTML = "No results.";
-        return;
-    }
 
     let response = await fetch(`./api/search/${steamQueryInputString}`);
     let body = await response.json();

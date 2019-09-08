@@ -16,6 +16,12 @@ function main() {
         res.json(gamePageData);
     });
 
+    _app.get('/api/search/', async (req, res) => {
+        let query = "";
+        let searchPageData = await _steamScraper.getSearchPageData(query);
+        res.json(searchPageData);
+    });
+
     _app.get('/api/search/:query', async (req, res) => {
         let query = req.params.query;
         let searchPageData = await _steamScraper.getSearchPageData(query);
