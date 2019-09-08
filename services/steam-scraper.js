@@ -5,7 +5,8 @@ const TITLE_REMOVE = [
     'Buy',
     'Play',
     'Download',
-    'Install'
+    'Install',
+    'Pre-Purchase'
 ];
 const STEAM_APP_URL = 'https://store.steampowered.com/app/{{APP_ID}}';
 const STEAM_SEARCH_URL = 'https://store.steampowered.com/search/?{{QUERY}}'
