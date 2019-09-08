@@ -1,7 +1,6 @@
 const _cheerio = require('cheerio');
 const _rp = require('request-promise');
 
-const PERCENT_OFF_REMOVE = '-';
 const TITLE_REMOVE = [
     'Buy',
     'Play',
@@ -12,6 +11,7 @@ const STEAM_APP_URL = 'https://store.steampowered.com/app/{{APP_ID}}';
 const STEAM_SEARCH_URL = 'https://store.steampowered.com/search/?{{QUERY}}'
 
 const APP_ID_URL_REGEX = /\/app\/(\d+)\//i;
+const PERCENT_NUMBER_REGEX = /(\d+)%/;
 
 async function getAppPageData(appId) {
     let appUrl = STEAM_APP_URL.replace('{{APP_ID}}', appId);
@@ -65,6 +65,13 @@ function extractAppIdFromUrl(input) {
     }
 }
 
+function extractNumberFromPercent(input) {
+    let match = PERCENT_NUMBER_REGEX.exec(input);
+    if (match) {
+        return match[1];
+    }
+}
+
 function getHeadsets($) {
     let headsetTitleElement = $('.details_block.vrsupport > div:contains("Headsets")').parent();
     let headsetElements = Array.from(headsetTitleElement.nextUntil('.details_block'));
@@ -87,7 +94,7 @@ function getGameData($, firstGame) {
     }
 
     let discounted = $('.discount_block', firstGame).length > 0;
-    
+
     let originalPrice = "";
     let discountPrice = "";
     let percentOff = "";
@@ -96,8 +103,9 @@ function getGameData($, firstGame) {
         originalPrice = $('.discount_original_price', firstGame).text().trim();
         discountPrice = $('.discount_final_price', firstGame).text().trim();
         percentOff = $('.discount_pct', firstGame).text().trim();
-        if (percentOff.startsWith(PERCENT_OFF_REMOVE)) {
-            percentOff = percentOff.substr(PERCENT_OFF_REMOVE.length);
+        let percentOffNumber = extractNumberFromPercent(percentOff);
+        if (percentOffNumber) {
+            percentOff = percentOffNumber;
         }
     }
     else {
