@@ -11,7 +11,6 @@ const TITLE_REMOVE = [
 const STEAM_APP_URL = 'https://store.steampowered.com/app/{{APP_ID}}';
 const STEAM_SEARCH_URL = 'https://store.steampowered.com/search/?{{QUERY}}'
 
-const APP_ID_URL_REGEX = /\/app\/(\d+)\//i;
 const PERCENT_REGEX = /(\d+%)/;
 
 async function getAppPageData(appId) {
@@ -28,11 +27,11 @@ async function getAppPageData(appId) {
     }
 
     let firstGame = gameElements[0];
-    let gameData = getGameData($, firstGame);
+    let gameData = getGameDataFromGameElement(firstGame);
     let headsets = getHeadsets($);
 
     return {
-        url: appUrl,
+        link: appUrl,
         ...gameData,
         headsets
     };
@@ -45,25 +44,12 @@ async function getSearchPageData(query) {
 
     let searchResults = Array.from($('#search_resultsRows > a[href*="\/app\/"].search_result_row'));
 
-    let appIds = searchResults.map(searchResult => extractAppIdFromUrl(searchResult.attribs.href));
-    // Remove duplicate appIds
-    appIds = Array.from(new Set(appIds));
-
     let searchPageData = [];
-    for (var appId of appIds) {
-        let appPageData = await getAppPageData(appId);
-        if (appPageData && !appPageData.error) {
-            searchPageData.push(appPageData);
-        }
+    for (var searchResult of searchResults) {
+        let gameData = await getGameDataFromSearchResult(searchResult);
+        searchPageData.push(gameData);
     }
     return searchPageData;
-}
-
-function extractAppIdFromUrl(input) {
-    let match = APP_ID_URL_REGEX.exec(input);
-    if (match) {
-        return match[1];
-    }
 }
 
 function extractPercent(input) {
@@ -71,6 +57,10 @@ function extractPercent(input) {
     if (match) {
         return match[1];
     }
+}
+
+function stripQueryString(url) {
+    return url.split(/[?#]/)[0];
 }
 
 function getHeadsets($) {
@@ -86,38 +76,76 @@ function getHeadsets($) {
     return headsets;
 }
 
-function getGameData($, firstGame) {
-    let title = $('.game_area_purchase_game > h1', firstGame).children().remove().end().text().trim();
+async function getHeadsetsFromLink(link) {
+    let pageHtml = await _rp({ url: link });
+    let $ = _cheerio.load(pageHtml);
+    return getHeadsets($);
+}
+
+async function getGameDataFromSearchResult(searchResult) {
+    let $ = _cheerio.load(searchResult);
+
+    let title = "";
+    let link = "";
+    let price = "";
+    let discounted = false;
+    let originalPrice = "";
+    let percentOff = "";
+    let headsets = [];
+
+    title = $('div.search_name > span.title').text().trim();
+    link = stripQueryString(searchResult.attribs.href);
+    price = $('div.search_price').clone().children().remove().end().text().trim();
+    originalPrice = $('div.search_price > span > strike').text().trim();
+    percentOff = extractPercent($('div.search_discount > span').text().trim());
+
+    if (originalPrice && percentOff) {
+        discounted = true;
+    }
+
+    headsets = await getHeadsetsFromLink(link);
+
+    return {
+        title,
+        link,
+        originalPrice,
+        discounted,
+        price,
+        percentOff,
+        headsets
+    };
+}
+
+function getGameDataFromGameElement(gameElement) {
+    let $ = _cheerio.load(gameElement);
+
+    let title = "";
+    let price = "";
+    let discounted = false;
+    let originalPrice = "";
+    let percentOff = "";
+
+    title = $('.game_area_purchase_game > h1').children().remove().end().text().trim();
     for (var removeKeyword of TITLE_REMOVE) {
         if (title.startsWith(removeKeyword)) {
             title = title.substr(removeKeyword.length).trim();
         }
     }
 
-    let discounted = $('.discount_block', firstGame).length > 0;
+    originalPrice = $('.discount_original_price').text().trim();
+    percentOff = extractPercent($('.discount_pct').text().trim());
 
-    let originalPrice = "";
-    let discountPrice = "";
-    let percentOff = "";
+    if (originalPrice && percentOff) {
+        discounted = true;
+    }
 
-    if (discounted) {
-        originalPrice = $('.discount_original_price', firstGame).text().trim();
-        discountPrice = $('.discount_final_price', firstGame).text().trim();
-        percentOff = $('.discount_pct', firstGame).text().trim();
-        let percentOffExtracted = extractPercent(percentOff);
-        if (percentOffExtracted) {
-            percentOff = percentOffExtracted;
-        }
-    }
-    else {
-        originalPrice = $('.game_purchase_price', firstGame).text().trim();
-    }
+    price = discounted ? $('.discount_final_price').text().trim() : $('.game_purchase_price').text().trim();;
 
     return {
         title,
         originalPrice,
         discounted,
-        discountPrice,
+        price,
         percentOff
     };
 }
