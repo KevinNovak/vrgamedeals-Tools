@@ -28,7 +28,7 @@ async function getAppPageData(appId) {
     }
 
     let firstGame = gameElements[0];
-    let gameData = getGameData($, firstGame);
+    let gameData = getGameDataFromGameElement($, firstGame);
     let headsets = getHeadsets($);
 
     return {
@@ -45,16 +45,10 @@ async function getSearchPageData(query) {
 
     let searchResults = Array.from($('#search_resultsRows > a[href*="\/app\/"].search_result_row'));
 
-    let appIds = searchResults.map(searchResult => extractAppIdFromUrl(searchResult.attribs.href));
-    // Remove duplicate appIds
-    appIds = Array.from(new Set(appIds));
-
     let searchPageData = [];
-    for (var appId of appIds) {
-        let appPageData = await getAppPageData(appId);
-        if (appPageData && !appPageData.error) {
-            searchPageData.push(appPageData);
-        }
+    for (var searchResult of searchResults) {
+        let gameData = getGameDataFromSearchResult(searchResult);
+        searchPageData.push(gameData);
     }
     return searchPageData;
 }
@@ -73,6 +67,10 @@ function extractPercent(input) {
     }
 }
 
+function stripQueryString(url) {
+    return url.split(/[?#]/)[0];
+}
+
 function getHeadsets($) {
     let headsetTitleElement = $('.details_block.vrsupport > div:contains("Headsets")').parent();
     let headsetElements = Array.from(headsetTitleElement.nextUntil('.details_block'));
@@ -86,7 +84,37 @@ function getHeadsets($) {
     return headsets;
 }
 
-function getGameData($, firstGame) {
+function getGameDataFromSearchResult(searchResult) {
+    let $ = _cheerio.load(searchResult);
+
+    let title = "";
+    let link = "";
+    let originalPrice = "";
+    let discounted = false;
+    let price = "";
+    let percentOff = "";
+
+    title = $('div.search_name > span.title').text().trim();
+    link = stripQueryString(searchResult.attribs.href);
+    originalPrice = $('div.search_price > span > strike').text().trim();
+    price = $('div.search_price').clone().children().remove().end().text().trim();
+    percentOff = extractPercent($('div.search_discount > span').text().trim());
+
+    if (percentOff) {
+        discounted = true;
+    }
+
+    return {
+        title,
+        link,
+        originalPrice,
+        discounted,
+        price,
+        percentOff
+    };
+}
+
+function getGameDataFromGameElement($, firstGame) {
     let title = $('.game_area_purchase_game > h1', firstGame).children().remove().end().text().trim();
     for (var removeKeyword of TITLE_REMOVE) {
         if (title.startsWith(removeKeyword)) {
