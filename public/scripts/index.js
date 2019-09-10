@@ -28,15 +28,15 @@ async function retrieveGameData() {
         if (isVr) {
             let platforms = getPlatformText(body.headsets);
             if (discounted) {
-                link.innerText = `[${platforms}] ${body.title} (${body.discountPrice} / ${body.percentOff} off)`;
+                link.innerText = `[${platforms}] ${body.title} (${body.price} / ${body.percentOff} off)`;
             } else {
-                link.innerText = `[${platforms}] ${body.title} (${body.originalPrice})`;
+                link.innerText = `[${platforms}] ${body.title} (${body.price})`;
             }
         } else {
             if (discounted) {
-                link.innerText = `${body.title} (${body.discountPrice} / ${body.percentOff} off)`;
+                link.innerText = `${body.title} (${body.price} / ${body.percentOff} off)`;
             } else {
-                link.innerText = `${body.title} (${body.originalPrice})`;
+                link.innerText = `${body.title} (${body.price})`;
             }
         }
         link.href = body.url;
