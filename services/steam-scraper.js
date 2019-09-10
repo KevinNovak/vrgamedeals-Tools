@@ -46,7 +46,7 @@ async function getSearchPageData(query) {
 
     let searchPageData = [];
     for (var searchResult of searchResults) {
-        let gameData = getGameDataFromSearchResult(searchResult);
+        let gameData = await getGameDataFromSearchResult(searchResult);
         searchPageData.push(gameData);
     }
     return searchPageData;
@@ -76,7 +76,13 @@ function getHeadsets($) {
     return headsets;
 }
 
-function getGameDataFromSearchResult(searchResult) {
+async function getHeadsetsFromLink(link) {
+    let pageHtml = await _rp({ url: link });
+    let $ = _cheerio.load(pageHtml);
+    return getHeadsets($);
+}
+
+async function getGameDataFromSearchResult(searchResult) {
     let $ = _cheerio.load(searchResult);
 
     let title = "";
@@ -85,6 +91,7 @@ function getGameDataFromSearchResult(searchResult) {
     let discounted = false;
     let originalPrice = "";
     let percentOff = "";
+    let headsets = [];
 
     title = $('div.search_name > span.title').text().trim();
     link = stripQueryString(searchResult.attribs.href);
@@ -96,13 +103,16 @@ function getGameDataFromSearchResult(searchResult) {
         discounted = true;
     }
 
+    headsets = await getHeadsetsFromLink(link);
+
     return {
         title,
         link,
         originalPrice,
         discounted,
         price,
-        percentOff
+        percentOff,
+        headsets
     };
 }
 
