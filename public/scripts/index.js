@@ -39,7 +39,7 @@ async function retrieveGameData() {
                 link.innerText = `${body.title} (${body.price})`;
             }
         }
-        link.href = body.url;
+        link.href = body.link;
         link.target = '_blank';
         link.style.display = 'inline';
 
