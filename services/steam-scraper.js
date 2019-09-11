@@ -12,6 +12,7 @@ const STEAM_APP_URL = 'https://store.steampowered.com/app/{{APP_ID}}';
 const STEAM_SEARCH_URL = 'https://store.steampowered.com/search/?{{QUERY}}'
 
 const PERCENT_REGEX = /(\d+%)/;
+const REVIEWS_COUNT_REGEX = /([\d,]+) user review/;
 
 async function getAppPageData(appId) {
     let appUrl = STEAM_APP_URL.replace('{{APP_ID}}', appId);
@@ -59,6 +60,13 @@ function extractPercent(input) {
     }
 }
 
+function extractReviewsCount(input) {
+    let match = REVIEWS_COUNT_REGEX.exec(input);
+    if (match) {
+        return match[1];
+    }
+}
+
 function stripQueryString(url) {
     return url.split(/[?#]/)[0];
 }
@@ -91,6 +99,8 @@ async function getGameDataFromSearchResult(searchResult) {
     let discounted = false;
     let originalPrice = "";
     let percentOff = "";
+    let reviewsPercent = "";
+    let reviewsCount = "";
     let headsets = [];
 
     title = $('div.search_name > span.title').text().trim();
@@ -98,6 +108,14 @@ async function getGameDataFromSearchResult(searchResult) {
     price = $('div.search_price').clone().children().remove().end().text().trim();
     originalPrice = $('div.search_price > span > strike').text().trim();
     percentOff = extractPercent($('div.search_discount > span').text().trim());
+
+    let reviewsSummary = $('div.search_reviewscore > span.search_review_summary').attr('data-tooltip-html');
+
+    if (reviewsSummary) {
+        reviewsSummary = reviewsSummary.trim();
+        reviewsPercent = extractPercent(reviewsSummary);
+        reviewsCount = extractReviewsCount(reviewsSummary);
+    }
 
     if (originalPrice && percentOff) {
         discounted = true;
@@ -112,6 +130,8 @@ async function getGameDataFromSearchResult(searchResult) {
         discounted,
         price,
         percentOff,
+        reviewsPercent,
+        reviewsCount,
         headsets
     };
 }
