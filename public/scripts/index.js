@@ -102,7 +102,7 @@ async function retrieveSearchData() {
 
 function createMarkdownTable(gamesData) {
     let header = '| Platform | Title | Price (USD) | Percent Off | Reviews | # Reviews |';
-    let divider = '| - | - | - | - |';
+    let divider = '| - | - | - | - | - | - |';
     let result = header + NEW_LINE + divider + NEW_LINE;
 
     for (game of gamesData) {
