@@ -101,7 +101,7 @@ async function retrieveSearchData() {
 }
 
 function createMarkdownTable(gamesData) {
-    let header = '| Platform | Title | Price (USD) | Percent Off |';
+    let header = '| Platform | Title | Price (USD) | Percent Off | Reviews | # Reviews |';
     let divider = '| - | - | - | - |';
     let result = header + NEW_LINE + divider + NEW_LINE;
 
@@ -111,8 +111,11 @@ function createMarkdownTable(gamesData) {
         let link = game.link;
         let price = extractNumberFromPrice(game.price) || game.price || "";
         let percentOff = extractNumberFromPercent(game.percentOff) || game.percentOff || "";
+        let reviews = extractNumberFromPercent(game.reviewsPercent) || game.reviewsPercent || "";
+        let reviewsCount = game.reviewsCount || "";
 
-        result += `| ${platform} | [${title}](${link}) | ${price} | ${percentOff} |` + NEW_LINE;
+
+        result += `| ${platform} | [${title}](${link}) | ${price} | ${percentOff} | ${reviews} | ${reviewsCount} |` + NEW_LINE;
     }
 
     return result;
