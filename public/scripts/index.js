@@ -120,7 +120,6 @@ function createMarkdownTable(gamesData) {
         let reviews = extractNumberFromPercent(game.reviewsPercent) || game.reviewsPercent || "";
         let reviewsCount = game.reviewsCount || "";
 
-
         result += `| ${platform} | [${title}](${link}) | ${price} | ${percentOff} | ${reviews} | ${reviewsCount} |` + NEW_LINE;
     }
 
