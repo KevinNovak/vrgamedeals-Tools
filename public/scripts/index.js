@@ -1,6 +1,32 @@
-const NEW_LINE = '&#10';
+const STEAM_APP_URL_REGEX = /https:\/\/store.steampowered.com\/app\/\d+/;
+const STEAM_SEARCH_URL_REGEX = /https:\/\/store.steampowered.com\/search\/\S*/;
 const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
 const PERCENT_NUMBER_REGEX = /(\d+)%/;
+
+const NEW_LINE = '&#10';
+
+const headsetAliases = {
+    'Valve Index': {
+        shortName: 'Index',
+        abbreviation: 'I'
+    },
+    'HTC Vive': {
+        shortName: 'Vive',
+        abbreviation: 'V'
+    },
+    'Oculus Rift': {
+        shortName: 'Rift',
+        abbreviation: 'R'
+    },
+    'Oculus Rift DK2': {
+        shortName: 'Rift DK2',
+        abbreviation: 'DK2'
+    },
+    'Windows Mixed Reality': {
+        shortName: 'WMR',
+        abbreviation: 'W'
+    }
+}
 
 async function retrieveGameData() {
     let retrievePageButton = document.getElementById('retrieve-page-button');
@@ -9,16 +35,29 @@ async function retrieveGameData() {
     retrievePageButton.disabled = true;
     pageResultsDiv.innerHTML = "Retrieving...";
 
-    let steamAppIdInput = document.getElementById('steam-app-id');
-    let steamAppIdString = steamAppIdInput.value;
-    if (!steamAppIdString) {
+    let steamAppUrlInput = document.getElementById('steam-app-url');
+    let steamAppUrl = steamAppUrlInput.value.trim();
+    if (!steamAppUrl || !STEAM_APP_URL_REGEX.test(steamAppUrl)) {
         retrievePageButton.disabled = false;
-        pageResultsDiv.innerHTML = "No results.";
+        pageResultsDiv.innerHTML = "No results. Please input a valid Steam App URL.";
         return;
     }
 
     try {
-        let response = await fetch(`./api/app/${steamAppIdString}`);
+        let response = await fetch(
+            `./api/app-scrape`,
+            {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                    {
+                        url: steamAppUrl
+                    }
+                )
+            });
         let body = await response.json();
 
         let discounted = body.discounted;
@@ -53,29 +92,6 @@ async function retrieveGameData() {
     retrievePageButton.disabled = false;
 }
 
-const headsetAliases = {
-    'Valve Index': {
-        shortName: 'Index',
-        abbreviation: 'I'
-    },
-    'HTC Vive': {
-        shortName: 'Vive',
-        abbreviation: 'V'
-    },
-    'Oculus Rift': {
-        shortName: 'Rift',
-        abbreviation: 'R'
-    },
-    'Oculus Rift DK2': {
-        shortName: 'Rift DK2',
-        abbreviation: 'DK2'
-    },
-    'Windows Mixed Reality': {
-        shortName: 'WMR',
-        abbreviation: 'W'
-    }
-}
-
 async function retrieveSearchData() {
     let searchResultsDiv = document.getElementById('search-results');
     let retrieveSearchButton = document.getElementById('retrieve-search-button');
@@ -83,12 +99,35 @@ async function retrieveSearchData() {
     retrieveSearchButton.disabled = true;
     searchResultsDiv.innerHTML = "Retrieving...";
 
-    let steamQueryInput = document.getElementById('steam-query');
-    let steamQueryInputString = steamQueryInput.value.trim();
+    let steamSearchUrlInput = document.getElementById('steam-search-url');
+    let steamSearchUrl = steamSearchUrlInput.value.trim();
+    if (!steamSearchUrl || !STEAM_SEARCH_URL_REGEX.test(steamSearchUrl)) {
+        retrieveSearchButton.disabled = false;
+        searchResultsDiv.innerHTML = "No results. Please input a valid Steam Search URL.";
+        return;
+    }
 
     try {
-        let response = await fetch(`./api/search/${steamQueryInputString}`);
+        let response = await fetch(
+            `./api/search-scrape`,
+            {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                    {
+                        url: steamSearchUrl
+                    }
+                )
+            });
         let body = await response.json();
+        if (!body || body.length < 1) {
+            retrieveSearchButton.disabled = false;
+            searchResultsDiv.innerHTML = "No results.";
+            return;
+        }
 
         let text = createMarkdownTable(body);
 

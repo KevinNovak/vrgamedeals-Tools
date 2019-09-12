@@ -1,3 +1,32 @@
+:root {
+  --placeholder-color: #ced4da;
+}
+
 textarea.search-result {
-    min-height: 300px;
+  min-height: 300px;
+}
+
+.form-control::-webkit-input-placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+.form-control::-moz-placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+.form-control:-ms-input-placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+.form-control::-ms-input-placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+.form-control::placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
 }

@@ -8,14 +8,11 @@ const TITLE_REMOVE = [
     'Install',
     'Pre-Purchase'
 ];
-const STEAM_APP_URL = 'https://store.steampowered.com/app/{{APP_ID}}';
-const STEAM_SEARCH_URL = 'https://store.steampowered.com/search/?{{QUERY}}'
 
 const PERCENT_REGEX = /(\d+%)/;
 const REVIEWS_COUNT_REGEX = /([\d,]+) user review/;
 
-async function getAppPageData(appId) {
-    let appUrl = STEAM_APP_URL.replace('{{APP_ID}}', appId);
+async function getAppPageData(appUrl) {
     let appPageHtml = await _rp({ url: appUrl });
     let $ = _cheerio.load(appPageHtml);
 
@@ -38,8 +35,7 @@ async function getAppPageData(appId) {
     };
 }
 
-async function getSearchPageData(query) {
-    let searchUrl = STEAM_SEARCH_URL.replace('{{QUERY}}', query);
+async function getSearchPageData(searchUrl) {
     let searchPageHtml = await _rp({ url: searchUrl });
     let $ = _cheerio.load(searchPageHtml);
 
