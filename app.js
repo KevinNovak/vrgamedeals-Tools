@@ -10,21 +10,15 @@ function main() {
     _app.use(_bodyParser.urlencoded({ extended: false }))
     _app.use(_bodyParser.json());
 
-    _app.get('/api/app/:id', async (req, res) => {
-        let id = req.params.id;
-        let gamePageData = await _steamScraper.getAppPageData(id);
+    _app.post('/api/app-scrape', async (req, res) => {
+        let appUrl = req.body.url;
+        let gamePageData = await _steamScraper.getAppPageData(appUrl);
         res.json(gamePageData);
     });
 
-    _app.get('/api/search', async (req, res) => {
-        let query = "";
-        let searchPageData = await _steamScraper.getSearchPageData(query);
-        res.json(searchPageData);
-    });
-
-    _app.get('/api/search/:query', async (req, res) => {
-        let query = req.params.query;
-        let searchPageData = await _steamScraper.getSearchPageData(query);
+    _app.post('/api/search-scrape', async (req, res) => {
+        let searchUrl = req.body.url;
+        let searchPageData = await _steamScraper.getSearchPageData(searchUrl);
         res.json(searchPageData);
     });
 

@@ -128,19 +128,13 @@
             <h5>
               Scrapes the provided Steam page and returns a formatted title.
             </h5>
-            <label for="steam-app-id"><b>Steam App ID</b></label>
+            <label for="steam-app-url"><b>Steam App URL</b></label>
             <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon3"
-                  >https://store.steampowered.com/app/</span
-                >
-              </div>
               <input
-                id="steam-app-id"
-                type="number"
+                id="steam-app-url"
+                type="url"
                 class="form-control"
-                placeholder="450390"
-                value="450390"
+                placeholder="https://store.steampowered.com/app/450390/The_Lab/"
               />
               <div class="input-group-append">
                 <button
@@ -166,19 +160,13 @@
               Scrapes the provided Steam search and returns a formatted markdown
               table.
             </h5>
-            <label for="steam-app-id"><b>Steam Search Query</b></label>
+            <label for="steam-search-url"><b>Steam Search URL</b></label>
             <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon3"
-                  >https://store.steampowered.com/search/?</span
-                >
-              </div>
               <input
-                id="steam-query"
-                type="text"
+                id="steam-search-url"
+                type="url"
                 class="form-control"
-                placeholder="vrsupport=402&filter=weeklongdeals"
-                value="vrsupport=402&filter=weeklongdeals"
+                placeholder="https://store.steampowered.com/search/?vrsupport=402&filter=weeklongdeals"
               />
               <div class="input-group-append">
                 <button

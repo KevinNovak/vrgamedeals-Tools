@@ -9,16 +9,29 @@ async function retrieveGameData() {
     retrievePageButton.disabled = true;
     pageResultsDiv.innerHTML = "Retrieving...";
 
-    let steamAppIdInput = document.getElementById('steam-app-id');
-    let steamAppIdString = steamAppIdInput.value;
-    if (!steamAppIdString) {
+    let steamAppUrlInput = document.getElementById('steam-app-url');
+    let steamAppUrl = steamAppUrlInput.value.trim();
+    if (!steamAppUrl) {
         retrievePageButton.disabled = false;
         pageResultsDiv.innerHTML = "No results.";
         return;
     }
 
     try {
-        let response = await fetch(`./api/app/${steamAppIdString}`);
+        let response = await fetch(
+            `./api/app-scrape`,
+            {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                    {
+                        url: steamAppUrl
+                    }
+                )
+            });
         let body = await response.json();
 
         let discounted = body.discounted;
@@ -83,11 +96,24 @@ async function retrieveSearchData() {
     retrieveSearchButton.disabled = true;
     searchResultsDiv.innerHTML = "Retrieving...";
 
-    let steamQueryInput = document.getElementById('steam-query');
-    let steamQueryInputString = steamQueryInput.value.trim();
+    let steamSearchUrlInput = document.getElementById('steam-search-url');
+    let steamSearchUrl = steamSearchUrlInput.value.trim();
 
     try {
-        let response = await fetch(`./api/search/${steamQueryInputString}`);
+        let response = await fetch(
+            `./api/search-scrape`,
+            {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                    {
+                        url: steamSearchUrl
+                    }
+                )
+            });
         let body = await response.json();
 
         let text = createMarkdownTable(body);
