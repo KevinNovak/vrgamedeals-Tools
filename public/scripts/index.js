@@ -98,6 +98,11 @@ async function retrieveSearchData() {
 
     let steamSearchUrlInput = document.getElementById('steam-search-url');
     let steamSearchUrl = steamSearchUrlInput.value.trim();
+    if (!steamSearchUrl) {
+        retrieveSearchButton.disabled = false;
+        searchResultsDiv.innerHTML = "No results.";
+        return;
+    }
 
     try {
         let response = await fetch(
