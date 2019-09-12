@@ -86,23 +86,29 @@ async function retrieveSearchData() {
     let steamQueryInput = document.getElementById('steam-query');
     let steamQueryInputString = steamQueryInput.value.trim();
 
-    let response = await fetch(`./api/search/${steamQueryInputString}`);
-    let body = await response.json();
+    try {
+        let response = await fetch(`./api/search/${steamQueryInputString}`);
+        let body = await response.json();
 
-    let text = createMarkdownTable(body);
+        let text = createMarkdownTable(body);
 
-    let textArea = document.createElement('textarea');
-    textArea.classList.add('form-control', 'search-result');
-    textArea.innerHTML = text;
+        let textArea = document.createElement('textarea');
+        textArea.classList.add('form-control', 'search-result');
+        textArea.innerHTML = text;
 
-    searchResultsDiv.innerHTML = "";
-    searchResultsDiv.appendChild(textArea);
+        searchResultsDiv.innerHTML = "";
+        searchResultsDiv.appendChild(textArea);
+    } catch (error) {
+        console.error(error);
+        searchResultsDiv.innerHTML = "No results.";
+    }
+
     retrieveSearchButton.disabled = false;
 }
 
 function createMarkdownTable(gamesData) {
     let header = '| Platform | Title | Price (USD) | Percent Off | Reviews | # Reviews |';
-    let divider = '| - | - | - | - |';
+    let divider = '| - | - | - | - | - | - |';
     let result = header + NEW_LINE + divider + NEW_LINE;
 
     for (game of gamesData) {
@@ -113,7 +119,6 @@ function createMarkdownTable(gamesData) {
         let percentOff = extractNumberFromPercent(game.percentOff) || game.percentOff || "";
         let reviews = extractNumberFromPercent(game.reviewsPercent) || game.reviewsPercent || "";
         let reviewsCount = game.reviewsCount || "";
-
 
         result += `| ${platform} | [${title}](${link}) | ${price} | ${percentOff} | ${reviews} | ${reviewsCount} |` + NEW_LINE;
     }
