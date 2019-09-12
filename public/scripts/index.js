@@ -86,17 +86,23 @@ async function retrieveSearchData() {
     let steamQueryInput = document.getElementById('steam-query');
     let steamQueryInputString = steamQueryInput.value.trim();
 
-    let response = await fetch(`./api/search/${steamQueryInputString}`);
-    let body = await response.json();
+    try {
+        let response = await fetch(`./api/search/${steamQueryInputString}`);
+        let body = await response.json();
 
-    let text = createMarkdownTable(body);
+        let text = createMarkdownTable(body);
 
-    let textArea = document.createElement('textarea');
-    textArea.classList.add('form-control', 'search-result');
-    textArea.innerHTML = text;
+        let textArea = document.createElement('textarea');
+        textArea.classList.add('form-control', 'search-result');
+        textArea.innerHTML = text;
 
-    searchResultsDiv.innerHTML = "";
-    searchResultsDiv.appendChild(textArea);
+        searchResultsDiv.innerHTML = "";
+        searchResultsDiv.appendChild(textArea);
+    } catch (error) {
+        console.error(error);
+        searchResultsDiv.innerHTML = "No results.";
+    }
+
     retrieveSearchButton.disabled = false;
 }
 
