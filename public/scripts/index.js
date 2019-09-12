@@ -43,22 +43,12 @@ async function retrieveGameData() {
         return;
     }
 
+    let content = {
+        url: steamAppUrl
+    }
+
     try {
-        let response = await fetch(
-            `./api/app-scrape`,
-            {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(
-                    {
-                        url: steamAppUrl
-                    }
-                )
-            });
-        let body = await response.json();
+        let body = await post('./api/app-scrape', content);
 
         let discounted = body.discounted;
         let isVr = body.headsets.length > 0;
@@ -107,22 +97,13 @@ async function retrieveSearchData() {
         return;
     }
 
+    let content = {
+        url: steamSearchUrl
+    };
+
     try {
-        let response = await fetch(
-            `./api/search-scrape`,
-            {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(
-                    {
-                        url: steamSearchUrl
-                    }
-                )
-            });
-        let body = await response.json();
+        let body = await post('./api/search-scrape', content);
+
         if (!body || body.length < 1) {
             retrieveSearchButton.disabled = false;
             searchResultsDiv.innerHTML = "No results.";
@@ -163,6 +144,20 @@ function createMarkdownTable(gamesData) {
     }
 
     return result;
+}
+
+async function post(url, content) {
+    let response = await fetch(
+        url,
+        {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(content)
+        });
+    return await response.json();
 }
 
 function escapePipes(input) {
