@@ -18,8 +18,7 @@ function main() {
 
     _app.post('/api/search-scrape', async (req, res) => {
         let searchUrl = req.body.url;
-        let pages = req.body.pages || 1;
-        let searchPageData = await _steamScraper.getSearchPageData(searchUrl, pages);
+        let searchPageData = await _steamScraper.getSearchPageData(searchUrl);
         res.json(searchPageData);
     });
 
