@@ -110,6 +110,7 @@ async function retrieveSteamSearchTable() {
                 let content = {
                     url: `${steamSearchUrl}&page=${i}`
                 };
+                searchResultsDiv.innerHTML = `Retrieving page ${i}...`;
                 let searchPageData = await post('./api/search-scrape', content);
                 searchData.push(...searchPageData);
             }
