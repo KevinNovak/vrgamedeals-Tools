@@ -4,6 +4,7 @@ const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
 const PERCENT_NUMBER_REGEX = /(\d+)%/;
 
 const NEW_LINE = '&#10';
+const MAX_PAGES = 20;
 
 const headsetAliases = {
     'Valve Index': {
@@ -28,8 +29,8 @@ const headsetAliases = {
     }
 }
 
-async function retrieveGameData() {
-    let retrievePageButton = document.getElementById('retrieve-page-button');
+async function retrieveSteamAppTitle() {
+    let retrievePageButton = document.getElementById('retrieve-steam-app-title');
     let pageResultsDiv = document.getElementById('page-results');
 
     retrievePageButton.disabled = true;
@@ -48,27 +49,27 @@ async function retrieveGameData() {
     }
 
     try {
-        let body = await post('./api/app-scrape', content);
+        let appData = await post('./api/app-scrape', content);
 
-        let discounted = body.discounted;
-        let isVr = body.headsets.length > 0;
+        let discounted = appData.discounted;
+        let isVr = appData.headsets.length > 0;
 
         let link = document.createElement('a');
         if (isVr) {
-            let platforms = getPlatformText(body.headsets);
+            let platforms = getPlatformText(appData.headsets);
             if (discounted) {
-                link.innerText = `[${platforms}] ${body.title} (${body.price} / ${body.percentOff} off)`;
+                link.innerText = `[${platforms}] ${appData.title} (${appData.price} / ${appData.percentOff} off)`;
             } else {
-                link.innerText = `[${platforms}] ${body.title} (${body.price})`;
+                link.innerText = `[${platforms}] ${appData.title} (${appData.price})`;
             }
         } else {
             if (discounted) {
-                link.innerText = `${body.title} (${body.price} / ${body.percentOff} off)`;
+                link.innerText = `${appData.title} (${appData.price} / ${appData.percentOff} off)`;
             } else {
-                link.innerText = `${body.title} (${body.price})`;
+                link.innerText = `${appData.title} (${appData.price})`;
             }
         }
-        link.href = body.link;
+        link.href = appData.link;
         link.target = '_blank';
         link.style.display = 'inline';
 
@@ -82,9 +83,9 @@ async function retrieveGameData() {
     retrievePageButton.disabled = false;
 }
 
-async function retrieveSearchData() {
+async function retrieveSteamSearchTable() {
     let searchResultsDiv = document.getElementById('search-results');
-    let retrieveSearchButton = document.getElementById('retrieve-search-button');
+    let retrieveSearchButton = document.getElementById('retrieve-steam-search-table');
 
     retrieveSearchButton.disabled = true;
     searchResultsDiv.innerHTML = "Retrieving...";
@@ -97,20 +98,37 @@ async function retrieveSearchData() {
         return;
     }
 
-    let content = {
-        url: steamSearchUrl
-    };
+    let searchAllPagesInput = document.getElementById('search-all-pages');
+    let searchAllPages = searchAllPagesInput.checked;
 
     try {
-        let body = await post('./api/search-scrape', content);
+        let searchData = [];
+        if (searchAllPages) {
+            for (let i = 1; i <= MAX_PAGES; i++) {
+                let content = {
+                    url: `${steamSearchUrl}&page=${i}`
+                };
+                searchResultsDiv.innerHTML = `Retrieving page ${i}...`;
+                let searchPageData = await post('./api/search-scrape', content);
+                if (searchPageData.length < 1) {
+                    break;
+                }
+                searchData.push(...searchPageData);
+            }
+        } else {
+            let content = {
+                url: steamSearchUrl
+            };
+            searchData = await post('./api/search-scrape', content);
+        }
 
-        if (!body || body.length < 1) {
+        if (!searchData || searchData.length < 1) {
             retrieveSearchButton.disabled = false;
             searchResultsDiv.innerHTML = "No results.";
             return;
         }
 
-        let text = createMarkdownTable(body);
+        let text = createMarkdownTable(searchData);
 
         let textArea = document.createElement('textarea');
         textArea.classList.add('form-control', 'search-result');
@@ -127,19 +145,19 @@ async function retrieveSearchData() {
     retrieveSearchButton.disabled = false;
 }
 
-function createMarkdownTable(gamesData) {
+function createMarkdownTable(searchData) {
     let header = '| Platform | Title | Price (USD) | Percent Off | Reviews | # Reviews |';
     let divider = '| - | - | - | - | - | - |';
     let result = header + NEW_LINE + divider + NEW_LINE;
 
-    for (game of gamesData) {
-        let platform = game.headsets.map(platform => getHeadsetAbbreviation(platform)).join('/');
-        let title = escapePipes(game.title);
-        let link = game.link;
-        let price = extractNumberFromPrice(game.price) || game.price || "";
-        let percentOff = extractNumberFromPercent(game.percentOff) || game.percentOff || "";
-        let reviews = extractNumberFromPercent(game.reviewsPercent) || game.reviewsPercent || "";
-        let reviewsCount = game.reviewsCount || "";
+    for (let app of searchData) {
+        let platform = app.headsets.map(platform => getHeadsetAbbreviation(platform)).join('/');
+        let title = escapePipes(app.title);
+        let link = app.link;
+        let price = extractNumberFromPrice(app.price) || app.price || "";
+        let percentOff = extractNumberFromPercent(app.percentOff) || app.percentOff || "";
+        let reviews = extractNumberFromPercent(app.reviewsPercent) || app.reviewsPercent || "";
+        let reviewsCount = app.reviewsCount || "";
 
         result += `| ${platform} | [${title}](${link}) | ${price} | ${percentOff} | ${reviews} | ${reviewsCount} |` + NEW_LINE;
     }
