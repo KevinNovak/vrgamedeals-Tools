@@ -4,6 +4,7 @@ const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
 const PERCENT_NUMBER_REGEX = /(\d+)%/;
 
 const NEW_LINE = '&#10';
+const MAX_PAGES = 20;
 
 const headsetAliases = {
     'Valve Index': {
@@ -100,13 +101,10 @@ async function retrieveSteamSearchTable() {
     let searchAllPagesInput = document.getElementById('search-all-pages');
     let searchAllPages = searchAllPagesInput.checked;
 
-    // TODO: Retrieve max page from steam, limit to 20
-    let maxPage = 20;
-
     try {
         let searchData = [];
         if (searchAllPages) {
-            for (let i = 1; i <= maxPage; i++) {
+            for (let i = 1; i <= MAX_PAGES; i++) {
                 let content = {
                     url: `${steamSearchUrl}&page=${i}`
                 };
