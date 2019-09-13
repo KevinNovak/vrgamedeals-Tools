@@ -197,24 +197,30 @@
               >
             </p>
             <label for="steam-search-url"><b>Steam Search URL</b></label>
-            <div class="input-group mb-3">
-              <input
-                id="steam-search-url"
-                type="url"
-                class="form-control"
-                placeholder="https://store.steampowered.com/search/?vrsupport=402&filter=weeklongdeals"
-              />
-              <div class="input-group-append">
-                <button
-                  id="retrieve-search-button"
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  onclick="retrieveSearchData()"
-                >
-                  Retrieve
-                </button>
-              </div>
-            </div>
+            <input
+              id="steam-search-url"
+              type="url"
+              class="form-control mb-3"
+              placeholder="https://store.steampowered.com/search/?vrsupport=402&filter=weeklongdeals"
+            />
+            <label for="pages"><b>Pages</b></label>
+            <input
+              id="pages"
+              type="number"
+              min="1"
+              max="20"
+              class="form-control mb-3"
+              placeholder="1"
+              value="1"
+            />
+            <button
+              id="retrieve-search-button"
+              class="btn btn-outline-secondary mb-3"
+              type="button"
+              onclick="retrieveSearchData()"
+            >
+              Retrieve
+            </button>
             <div id="search-results">
               <span>No results.</span>
             </div>
