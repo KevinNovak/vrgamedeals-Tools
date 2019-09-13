@@ -21,9 +21,7 @@ function main() {
         req.setTimeout(SEARCH_TIMEOUT);
 
         let searchUrl = req.body.url;
-        let pages = req.body.pages || 1;
-
-        let searchPageData = await _steamScraper.getSearchPageData(searchUrl, pages);
+        let searchPageData = await _steamScraper.getSearchPageData(searchUrl);
         res.json(searchPageData);
     });
 

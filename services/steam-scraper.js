@@ -35,24 +35,18 @@ async function getAppPageData(appUrl) {
     };
 }
 
-async function getSearchPageData(searchUrl, maxPage = 1) {
-    let searchData = [];
+async function getSearchPageData(searchUrl) {
+    let searchPageHtml = await _rp({ url: searchUrl });
+    let $ = _cheerio.load(searchPageHtml);
 
-    for (let i = 1; i <= maxPage; i++) {
-        let searchPageHtml = await _rp({ url: `${searchUrl}&page=${i}` });
-        let $ = _cheerio.load(searchPageHtml);
+    let searchResults = Array.from($('#search_resultsRows > a[href*="\/app\/"].search_result_row'));
 
-        let searchResults = Array.from($('#search_resultsRows > a[href*="\/app\/"].search_result_row'));
-
-        let searchPageData = [];
-        for (var searchResult of searchResults) {
-            let gameData = await getGameDataFromSearchResult(searchResult);
-            searchPageData.push(gameData);
-        }
-        searchData.push(...searchPageData);
+    let searchPageData = [];
+    for (var searchResult of searchResults) {
+        let gameData = await getGameDataFromSearchResult(searchResult);
+        searchPageData.push(gameData);
     }
-
-    return searchData;
+    return searchPageData;
 }
 
 function extractPercent(input) {
