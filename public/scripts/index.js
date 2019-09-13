@@ -97,8 +97,12 @@ async function retrieveSearchData() {
         return;
     }
 
+    let searchAllPagesInput = document.getElementById('search-all-pages');
+    let searchAllPages = searchAllPagesInput.checked;
+
     let content = {
-        url: steamSearchUrl
+        url: steamSearchUrl,
+        allPages: searchAllPages
     };
 
     try {
