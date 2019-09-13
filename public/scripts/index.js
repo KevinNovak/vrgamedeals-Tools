@@ -114,6 +114,7 @@ async function retrieveSearchData() {
 
         let textArea = document.createElement('textarea');
         textArea.classList.add('form-control', 'search-result');
+        textArea.readOnly = true;
         textArea.innerHTML = text;
 
         searchResultsDiv.innerHTML = "";
