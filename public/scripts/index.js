@@ -4,6 +4,8 @@ const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
 const PERCENT_NUMBER_REGEX = /(\d+)%/;
 
 const NEW_LINE = '&#10';
+const MIN_PAGES = 1;
+const MAX_PAGES = 20;
 
 const headsetAliases = {
     'Valve Index': {
@@ -97,8 +99,17 @@ async function retrieveSearchData() {
         return;
     }
 
+    let pagesInput = document.getElementById('pages');
+    let pages = parseInt(pagesInput.value.trim());
+    if (!pages || pages < MIN_PAGES || pages > MAX_PAGES) {
+        retrieveSearchButton.disabled = false;
+        searchResultsDiv.innerHTML = `No results. Please input a valid number of pages between ${MIN_PAGES} and ${MAX_PAGES}.`;
+        return;
+    }
+
     let content = {
-        url: steamSearchUrl
+        url: steamSearchUrl,
+        pages
     };
 
     try {
