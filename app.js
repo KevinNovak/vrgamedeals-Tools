@@ -4,7 +4,6 @@ const _bodyParser = require('body-parser');
 const _steamScraper = require('./services/steam-scraper');
 
 const PORT = process.env.PORT || 8080;
-const SEARCH_TIMEOUT = 180000;
 
 function main() {
     _app.use(_express.static('public'));
@@ -18,8 +17,6 @@ function main() {
     });
 
     _app.post('/api/search-scrape', async (req, res) => {
-        req.setTimeout(SEARCH_TIMEOUT);
-
         let searchUrl = req.body.url;
         let searchPageData = await _steamScraper.getSearchPageData(searchUrl);
         res.json(searchPageData);
