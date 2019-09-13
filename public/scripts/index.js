@@ -112,6 +112,9 @@ async function retrieveSteamSearchTable() {
                 };
                 searchResultsDiv.innerHTML = `Retrieving page ${i}...`;
                 let searchPageData = await post('./api/search-scrape', content);
+                if (searchPageData.length < 1) {
+                    break;
+                }
                 searchData.push(...searchPageData);
             }
         } else {
