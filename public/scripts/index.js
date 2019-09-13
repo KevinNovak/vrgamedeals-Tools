@@ -98,15 +98,27 @@ async function retrieveSteamSearchTable() {
     }
 
     let searchAllPagesInput = document.getElementById('search-all-pages');
-    // TODO: Retrieve multiple pages if checked
     let searchAllPages = searchAllPagesInput.checked;
 
-    let content = {
-        url: steamSearchUrl
-    };
+    // TODO: Retrieve max page from steam, limit to 20
+    let maxPage = 20;
 
     try {
-        let searchData = await post('./api/search-scrape', content);
+        let searchData = [];
+        if (searchAllPages) {
+            for (let i = 1; i <= maxPage; i++) {
+                let content = {
+                    url: `${steamSearchUrl}&page=${i}`
+                };
+                let searchPageData = await post('./api/search-scrape', content);
+                searchData.push(...searchPageData);
+            }
+        } else {
+            let content = {
+                url: steamSearchUrl
+            };
+            searchData = await post('./api/search-scrape', content);
+        }
 
         if (!searchData || searchData.length < 1) {
             retrieveSearchButton.disabled = false;
