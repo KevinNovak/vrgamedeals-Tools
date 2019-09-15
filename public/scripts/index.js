@@ -180,7 +180,7 @@ async function post(url, content) {
 }
 
 function escapePipes(input) {
-    return input.replace('|', '‖');
+    return input.replace(/\|/g, '‖');
 }
 
 function extractNumberFromPrice(input) {

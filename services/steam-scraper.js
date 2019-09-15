@@ -110,7 +110,7 @@ async function getGameDataFromSearchResult(searchResult) {
     if (reviewsSummary) {
         reviewsSummary = reviewsSummary.trim();
         reviewsPercent = extractPercent(reviewsSummary);
-        reviewsCount = extractReviewsCount(reviewsSummary).replace(',', '');
+        reviewsCount = extractReviewsCount(reviewsSummary).replace(/,/g, '');
     }
 
     if (originalPrice && percentOff) {
