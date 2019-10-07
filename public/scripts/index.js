@@ -147,7 +147,7 @@ async function retrieveSteamSearchTable() {
 
 function createMarkdownTable(searchData) {
     let header = '| Platform | Title | Price (USD) | Discount (%) | Rating (%) | Review Count |';
-    let divider = '| - | - | - | - | - | - |';
+    let divider = '| :- | :- | -: | -: | -: | -: |';
     let result = header + NEW_LINE + divider + NEW_LINE;
 
     for (let app of searchData) {
