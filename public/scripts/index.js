@@ -159,7 +159,9 @@ function createMarkdownTable(searchData) {
         let reviews = extractNumberFromPercent(app.reviewsPercent) || app.reviewsPercent || "";
         let reviewsCount = app.reviewsCount || "";
 
-        result += `| ${platform} | [${title}](${link}) | ${price} | ${percentOff} | ${reviews} | ${reviewsCount} |` + NEW_LINE;
+        let bundlePrefix = app.type == "BUNDLE" ? "**Bundle** - " : "";
+
+        result += `| ${platform} | ${bundlePrefix}[${title}](${link}) | ${price} | ${percentOff} | ${reviews} | ${reviewsCount} |` + NEW_LINE;
     }
 
     return result;

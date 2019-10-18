@@ -39,7 +39,7 @@ async function getSearchPageData(searchUrl) {
     let searchPageHtml = await _rp({ url: searchUrl });
     let $ = _cheerio.load(searchPageHtml);
 
-    let searchResults = Array.from($('#search_resultsRows > a[href*="\/app\/"].search_result_row'));
+    let searchResults = Array.from($('#search_resultsRows > a.search_result_row'));
 
     let searchPageData = [];
     for (var searchResult of searchResults) {
@@ -91,6 +91,7 @@ async function getGameDataFromSearchResult(searchResult) {
 
     let title = "";
     let link = "";
+    let type = "UNKNOWN";
     let price = "";
     let discounted = false;
     let originalPrice = "";
@@ -101,27 +102,37 @@ async function getGameDataFromSearchResult(searchResult) {
 
     title = $('div.search_name > span.title').text().trim();
     link = stripQueryString(searchResult.attribs.href);
+
+    if (link.includes('/app/')) {
+        type = "APP";
+    } else if (link.includes('/bundle/')) {
+        type = "BUNDLE";
+    }
+
     price = $('div.search_price').clone().children().remove().end().text().trim();
     originalPrice = $('div.search_price > span > strike').text().trim();
     percentOff = extractPercent($('div.search_discount > span').text().trim());
-
-    let reviewsSummary = $('div.search_reviewscore > span.search_review_summary').attr('data-tooltip-html');
-
-    if (reviewsSummary) {
-        reviewsSummary = reviewsSummary.trim();
-        reviewsPercent = extractPercent(reviewsSummary);
-        reviewsCount = extractReviewsCount(reviewsSummary).replace(/,/g, '');
-    }
 
     if (originalPrice && percentOff) {
         discounted = true;
     }
 
-    headsets = await getHeadsetsFromLink(link);
+    if (type == "APP") {
+        let reviewsSummary = $('div.search_reviewscore > span.search_review_summary').attr('data-tooltip-html');
+
+        if (reviewsSummary) {
+            reviewsSummary = reviewsSummary.trim();
+            reviewsPercent = extractPercent(reviewsSummary);
+            reviewsCount = extractReviewsCount(reviewsSummary).replace(/,/g, '');
+        }
+
+        headsets = await getHeadsetsFromLink(link);
+    }
 
     return {
         title,
         link,
+        type,
         originalPrice,
         discounted,
         price,
