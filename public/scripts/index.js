@@ -105,12 +105,14 @@ async function retrieveSteamSearchTable() {
         let searchData = [];
         if (searchAllPages) {
             for (let i = 1; i <= MAX_PAGES; i++) {
-                searchResultsDiv.innerHTML = `Retrieving page ${i}...`;
-                let searchPageData = await retrieveSearchPageData(`${steamSearchUrl}&page=${i}`)
+                let searchPageData = await retrieveSearchPageData(searchResultsDiv, steamSearchUrl, i);
+                if (searchPageData.length < 1) {	
+                    break;	
+                }
                 searchData.push(...searchPageData);
             }
         } else {
-            let searchPageData = await retrieveSearchPageData(steamSearchUrl);
+            let searchPageData = await retrieveSearchPageData(searchResultsDiv, steamSearchUrl);
             searchData.push(...searchPageData);
         }
 
@@ -137,12 +139,14 @@ async function retrieveSteamSearchTable() {
     retrieveSearchButton.disabled = false;
 }
 
-async function retrieveSearchPageData(steamSearchUrl) {
+async function retrieveSearchPageData(searchResultsDiv, steamSearchUrl, pageNumber = 1) {
     let content = {
-        url: steamSearchUrl
+        url: `${steamSearchUrl}&page=${pageNumber}`
     };
     let searchPageData = await post('./api/search-scrape', content);
-    for (let app of searchPageData) {
+    for (let [index, app] of searchPageData.entries()) {
+        let itemNumber = index + 1;
+        searchResultsDiv.innerHTML = `Retrieving page ${pageNumber}, result ${itemNumber} of ${searchPageData.length}...`;
         app.headsets = [];
         if (app.type == "APP") {
             let content = {
