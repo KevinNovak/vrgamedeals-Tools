@@ -4,7 +4,7 @@ const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
 const PERCENT_NUMBER_REGEX = /(\d+)%/;
 
 const NEW_LINE = '&#10';
-const MAX_PAGES = 20;
+const MAX_PAGES = 100;
 
 const headsetAliases = {
     'Valve Index': {
