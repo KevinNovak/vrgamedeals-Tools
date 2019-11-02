@@ -4,7 +4,7 @@ const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
 const PERCENT_NUMBER_REGEX = /(\d+)%/;
 
 const NEW_LINE = '&#10';
-const MAX_PAGES = 20;
+const MAX_PAGES = 100;
 
 const headsetAliases = {
     'Valve Index': {
@@ -105,21 +105,15 @@ async function retrieveSteamSearchTable() {
         let searchData = [];
         if (searchAllPages) {
             for (let i = 1; i <= MAX_PAGES; i++) {
-                let content = {
-                    url: `${steamSearchUrl}&page=${i}`
-                };
-                searchResultsDiv.innerHTML = `Retrieving page ${i}...`;
-                let searchPageData = await post('./api/search-scrape', content);
-                if (searchPageData.length < 1) {
-                    break;
+                let searchPageData = await retrieveSearchPageData(searchResultsDiv, steamSearchUrl, i);
+                if (searchPageData.length < 1) {	
+                    break;	
                 }
                 searchData.push(...searchPageData);
             }
         } else {
-            let content = {
-                url: steamSearchUrl
-            };
-            searchData = await post('./api/search-scrape', content);
+            let searchPageData = await retrieveSearchPageData(searchResultsDiv, steamSearchUrl);
+            searchData.push(...searchPageData);
         }
 
         if (!searchData || searchData.length < 1) {
@@ -143,6 +137,25 @@ async function retrieveSteamSearchTable() {
     }
 
     retrieveSearchButton.disabled = false;
+}
+
+async function retrieveSearchPageData(searchResultsDiv, steamSearchUrl, pageNumber = 1) {
+    let content = {
+        url: `${steamSearchUrl}&page=${pageNumber}`
+    };
+    let searchPageData = await post('./api/search-scrape', content);
+    for (let [index, app] of searchPageData.entries()) {
+        let itemNumber = index + 1;
+        searchResultsDiv.innerHTML = `Retrieving page ${pageNumber}, result ${itemNumber} of ${searchPageData.length}...`;
+        app.headsets = [];
+        if (app.type == "APP") {
+            let content = {
+                url: app.link
+            };
+            app.headsets = await post('./api/headset-scrape', content);
+        }
+    }
+    return searchPageData;
 }
 
 function createMarkdownTable(searchData) {
