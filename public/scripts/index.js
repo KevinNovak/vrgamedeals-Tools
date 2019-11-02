@@ -88,7 +88,6 @@ async function retrieveSteamSearchTable() {
     let retrieveSearchButton = document.getElementById('retrieve-steam-search-table');
 
     retrieveSearchButton.disabled = true;
-    searchResultsDiv.innerHTML = "Retrieving...";
 
     let steamSearchUrlInput = document.getElementById('steam-search-url');
     let steamSearchUrl = steamSearchUrlInput.value.trim();
@@ -105,14 +104,16 @@ async function retrieveSteamSearchTable() {
         let searchData = [];
         if (searchAllPages) {
             for (let i = 1; i <= MAX_PAGES; i++) {
-                let searchPageData = await retrieveSearchPageData(searchResultsDiv, steamSearchUrl, i);
-                if (searchPageData.length < 1) {	
-                    break;	
+                searchResultsDiv.innerHTML = `Retrieving page ${i}...`;
+                let searchPageData = await retrieveSearchPageData(steamSearchUrl, i);
+                if (searchPageData.length < 1) {
+                    break;
                 }
                 searchData.push(...searchPageData);
             }
         } else {
-            let searchPageData = await retrieveSearchPageData(searchResultsDiv, steamSearchUrl);
+            searchResultsDiv.innerHTML = "Retrieving page...";
+            let searchPageData = await retrieveSearchPageData(steamSearchUrl);
             searchData.push(...searchPageData);
         }
 
@@ -120,6 +121,18 @@ async function retrieveSteamSearchTable() {
             retrieveSearchButton.disabled = false;
             searchResultsDiv.innerHTML = "No results.";
             return;
+        }
+
+        for (let [index, app] of searchData.entries()) {
+            let itemNumber = index + 1;
+            searchResultsDiv.innerHTML = `Retrieving result ${itemNumber} of ${searchData.length}...`;
+            app.headsets = [];
+            if (app.type == "APP") {
+                let content = {
+                    url: app.link
+                };
+                app.headsets = await post('./api/headset-scrape', content);
+            }
         }
 
         let text = createMarkdownTable(searchData);
@@ -139,23 +152,14 @@ async function retrieveSteamSearchTable() {
     retrieveSearchButton.disabled = false;
 }
 
-async function retrieveSearchPageData(searchResultsDiv, steamSearchUrl, pageNumber = 1) {
+async function retrieveSearchPageData(steamSearchUrl, pageNumber) {
     let content = {
-        url: `${steamSearchUrl}&page=${pageNumber}`
+        url: `${steamSearchUrl}`
     };
-    let searchPageData = await post('./api/search-scrape', content);
-    for (let [index, app] of searchPageData.entries()) {
-        let itemNumber = index + 1;
-        searchResultsDiv.innerHTML = `Retrieving page ${pageNumber}, result ${itemNumber} of ${searchPageData.length}...`;
-        app.headsets = [];
-        if (app.type == "APP") {
-            let content = {
-                url: app.link
-            };
-            app.headsets = await post('./api/headset-scrape', content);
-        }
-    }
-    return searchPageData;
+    if (pageNumber) {
+        content.url += `&page=${pageNumber}`
+    };
+    return await post('./api/search-scrape', content);
 }
 
 function createMarkdownTable(searchData) {
