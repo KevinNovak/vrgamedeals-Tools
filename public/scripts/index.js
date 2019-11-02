@@ -139,6 +139,7 @@ async function retrieveSteamSearchTable() {
 
         let textArea = document.createElement('textarea');
         textArea.classList.add('form-control', 'search-result');
+        textArea.wrap = "off";
         textArea.readOnly = true;
         textArea.innerHTML = text;
 
