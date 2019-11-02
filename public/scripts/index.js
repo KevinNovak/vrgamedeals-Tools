@@ -105,21 +105,13 @@ async function retrieveSteamSearchTable() {
         let searchData = [];
         if (searchAllPages) {
             for (let i = 1; i <= MAX_PAGES; i++) {
-                let content = {
-                    url: `${steamSearchUrl}&page=${i}`
-                };
                 searchResultsDiv.innerHTML = `Retrieving page ${i}...`;
-                let searchPageData = await post('./api/search-scrape', content);
-                if (searchPageData.length < 1) {
-                    break;
-                }
+                let searchPageData = await retrieveSearchPageData(`${steamSearchUrl}&page=${i}`)
                 searchData.push(...searchPageData);
             }
         } else {
-            let content = {
-                url: steamSearchUrl
-            };
-            searchData = await post('./api/search-scrape', content);
+            let searchPageData = await retrieveSearchPageData(steamSearchUrl);
+            searchData.push(...searchPageData);
         }
 
         if (!searchData || searchData.length < 1) {
@@ -143,6 +135,23 @@ async function retrieveSteamSearchTable() {
     }
 
     retrieveSearchButton.disabled = false;
+}
+
+async function retrieveSearchPageData(steamSearchUrl) {
+    let content = {
+        url: steamSearchUrl
+    };
+    let searchPageData = await post('./api/search-scrape', content);
+    for (let app of searchPageData) {
+        app.headsets = [];
+        if (app.type == "APP") {
+            let content = {
+                url: app.link
+            };
+            app.headsets = await post('./api/headset-scrape', content);
+        }
+    }
+    return searchPageData;
 }
 
 function createMarkdownTable(searchData) {
