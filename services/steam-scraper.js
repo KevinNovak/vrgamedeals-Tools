@@ -80,7 +80,7 @@ function getHeadsets($) {
     return headsets;
 }
 
-async function getHeadsetsFromLink(link) {
+async function getHeadsetsFromAppPage(link) {
     let pageHtml = await _rp({ url: link });
     let $ = _cheerio.load(pageHtml);
     return getHeadsets($);
@@ -98,7 +98,6 @@ async function getGameDataFromSearchResult(searchResult) {
     let percentOff = "";
     let reviewsPercent = "";
     let reviewsCount = "";
-    let headsets = [];
 
     title = $('div.search_name > span.title').text().trim();
     link = stripQueryString(searchResult.attribs.href);
@@ -125,8 +124,6 @@ async function getGameDataFromSearchResult(searchResult) {
             reviewsPercent = extractPercent(reviewsSummary);
             reviewsCount = extractReviewsCount(reviewsSummary).replace(/,/g, '');
         }
-
-        headsets = await getHeadsetsFromLink(link);
     }
 
     return {
@@ -139,7 +136,6 @@ async function getGameDataFromSearchResult(searchResult) {
         percentOff,
         reviewsPercent,
         reviewsCount,
-        headsets
     };
 }
 
@@ -179,5 +175,6 @@ function getGameDataFromGameElement(gameElement) {
 
 module.exports = {
     getAppPageData,
+    getHeadsetsFromAppPage,
     getSearchPageData
 };

@@ -16,6 +16,12 @@ function main() {
         res.json(gamePageData);
     });
 
+    _app.post('/api/headset-scrape', async (req, res) => {
+        let searchUrl = req.body.url;
+        let searchPageData = await _steamScraper.getHeadsetsFromAppPage(searchUrl);
+        res.json(searchPageData);
+    });
+
     _app.post('/api/search-scrape', async (req, res) => {
         let searchUrl = req.body.url;
         let searchPageData = await _steamScraper.getSearchPageData(searchUrl);
