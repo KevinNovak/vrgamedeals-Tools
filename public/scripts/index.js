@@ -29,6 +29,10 @@ const headsetAliases = {
     }
 }
 
+let cache = {
+    searchData: []
+}
+
 async function retrieveSteamAppTitle() {
     let retrievePageButton = document.getElementById('retrieve-steam-app-title');
     let pageResultsDiv = document.getElementById('page-results');
@@ -157,22 +161,32 @@ async function retrieveSteamSearchTable() {
 }
 
 function formatAppData(app) {
-    let platform = app.headsets.map(platform => getHeadsetAbbreviation(platform)).join('/');
-    let title = escapePipes(app.title);
+    let type = app.type;
+    let platform = app.headsets.join(', ');
+    let platformAbbreviated = app.headsets.map(platform => getHeadsetAbbreviation(platform)).join('/');
+    let title = app.title;
+    let titleLink = escapePipes(app.title);
     let link = app.link;
     let price = extractNumberFromPrice(app.price) || app.price || "";
+    let originalPrice = extractNumberFromPrice(app.originalPrice) || app.price || "";
+    let discounted = app.discounted;
     let percentOff = extractNumberFromPercent(app.percentOff) || app.percentOff || "";
     let reviews = extractNumberFromPercent(app.reviewsPercent) || app.reviewsPercent || "";
     let reviewsCount = app.reviewsCount || "";
 
     let bundlePrefix = app.type == "BUNDLE" ? "**Bundle** - " : "";
-    title = `${bundlePrefix}[${title}](${link})`;
+    titleLink = `${bundlePrefix}[${titleLink}](${link})`;
 
     return {
+        type,
         platform,
+        platformAbbreviated,
         title,
+        titleLink,
         link,
         price,
+        originalPrice,
+        discounted,
         percentOff,
         reviews,
         reviewsCount
@@ -194,10 +208,15 @@ function createMarkdownTable(searchData) {
     let divider = '| :- | :- | -: | -: | -: | -: |';
     let result = header + NEW_LINE + divider + NEW_LINE;
 
+    let formattedData = [];
+
     for (let app of searchData) {
         let formatted = formatAppData(app);
-        result += `| ${formatted.platform} | ${formatted.title} | ${formatted.price} | ${formatted.percentOff} | ${formatted.reviews} | ${formatted.reviewsCount} |` + NEW_LINE;
+        result += `| ${formatted.platformAbbreviated} | ${formatted.titleLink} | ${formatted.price} | ${formatted.percentOff} | ${formatted.reviews} | ${formatted.reviewsCount} |` + NEW_LINE;
+        formattedData.push(formatted);
     }
+
+    cache.searchData = formattedData;
 
     return result;
 }
