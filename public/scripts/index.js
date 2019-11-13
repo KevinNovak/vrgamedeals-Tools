@@ -134,6 +134,7 @@ async function retrieveSteamSearchTable() {
 
                 let appData = await post('./api/search-app-scrape', content);
                 app.headsets = appData.headsets;
+                app.countdown = appData.countdown;
             }
         }
 
