@@ -171,6 +171,8 @@ function formatAppData(app) {
     let originalPrice = extractNumberFromPrice(app.originalPrice) || app.price || "";
     let discounted = app.discounted;
     let percentOff = extractNumberFromPercent(app.percentOff) || app.percentOff || "";
+    let countdownText = app.countdown.text;
+    let countdownTime = app.countdown.time;
     let reviews = extractNumberFromPercent(app.reviewsPercent) || app.reviewsPercent || "";
     let reviewsCount = app.reviewsCount || "";
 
@@ -188,6 +190,8 @@ function formatAppData(app) {
         originalPrice,
         discounted,
         percentOff,
+        countdownText,
+        countdownTime,
         reviews,
         reviewsCount
     }
