@@ -131,7 +131,9 @@ async function retrieveSteamSearchTable() {
                 let content = {
                     url: app.link
                 };
-                app.headsets = await post('./api/headset-scrape', content);
+
+                let appData = await post('./api/search-app-scrape', content);
+                app.headsets = appData.headsets;
             }
         }
 
