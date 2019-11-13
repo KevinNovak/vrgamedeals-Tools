@@ -6,7 +6,9 @@ const PERCENT_NUMBER_REGEX = /(\d+)%/;
 const NEW_LINE = '&#10';
 const MAX_PAGES = 100;
 
-const headsetAliases = {
+const BUNDLE_PREFIX = "**Bundle** - ";
+
+const HEADSET_ALIASES = {
     'Valve Index': {
         shortName: 'Index',
         abbreviation: 'I'
@@ -176,8 +178,8 @@ function formatAppData(app) {
     let reviews = extractNumberFromPercent(app.reviewsPercent) || app.reviewsPercent || "";
     let reviewsCount = app.reviewsCount || "";
 
-    let bundlePrefix = app.type == "BUNDLE" ? "**Bundle** - " : "";
-    titleLink = `${bundlePrefix}[${titleLink}](${link})`;
+    let titlePrefix = app.type == "BUNDLE" ? BUNDLE_PREFIX : "";
+    titleLink = `${titlePrefix}[${titleLink}](${link})`;
 
     return {
         type,
@@ -265,7 +267,7 @@ function getPlatformText(platforms) {
 }
 
 function getHeadsetshortName(headsetName) {
-    let headsetAlias = headsetAliases[headsetName];
+    let headsetAlias = HEADSET_ALIASES[headsetName];
     if (headsetAlias) {
         return headsetAlias.shortName;
     } else {
@@ -274,7 +276,7 @@ function getHeadsetshortName(headsetName) {
 }
 
 function getHeadsetAbbreviation(headsetName) {
-    let headsetAlias = headsetAliases[headsetName];
+    let headsetAlias = HEADSET_ALIASES[headsetName];
     if (headsetAlias) {
         return headsetAlias.abbreviation;
     } else {
