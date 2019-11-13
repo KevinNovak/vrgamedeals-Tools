@@ -11,6 +11,7 @@ const TITLE_REMOVE = [
 
 const PERCENT_REGEX = /(\d+%)/;
 const REVIEWS_COUNT_REGEX = /([\d,]+) user review/;
+const DISCOUNT_COUNTDOWN_REGEX = /DiscountCountdown,[ ]*([\d]{7,})/;
 
 async function getAppPageData(appUrl) {
     let appPageHtml = await _rp({ url: appUrl });
@@ -58,6 +59,13 @@ function extractPercent(input) {
 
 function extractReviewsCount(input) {
     let match = REVIEWS_COUNT_REGEX.exec(input);
+    if (match) {
+        return match[1];
+    }
+}
+
+function extractDiscountCountdown(input) {
+    let match = DISCOUNT_COUNTDOWN_REGEX.exec(input);
     if (match) {
         return match[1];
     }
@@ -143,6 +151,8 @@ function getGameDataFromGameElement(gameElement) {
     let $ = _cheerio.load(gameElement);
 
     let title = "";
+    let countdownText = "";
+    let countdownTime = "";
     let price = "";
     let discounted = false;
     let originalPrice = "";
@@ -155,6 +165,17 @@ function getGameDataFromGameElement(gameElement) {
         }
     }
 
+    try {
+        countdownText = $('.game_purchase_discount_countdown').text().trim();
+    } catch { };
+
+
+    try {
+        let countdownScript = $('.game_area_purchase_game > script')[0].children[0].data;
+        let countdownTimeText = extractDiscountCountdown(countdownScript);
+        countdownTime = parseInt(countdownTimeText);
+    } catch { };
+
     originalPrice = $('.discount_original_price').text().trim();
     percentOff = extractPercent($('.discount_pct').text().trim());
 
@@ -166,6 +187,8 @@ function getGameDataFromGameElement(gameElement) {
 
     return {
         title,
+        countdownText,
+        countdownTime,
         originalPrice,
         discounted,
         price,
