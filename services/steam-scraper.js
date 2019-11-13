@@ -88,10 +88,49 @@ function getHeadsets($) {
     return headsets;
 }
 
-async function getHeadsetsFromAppPage(link) {
-    let pageHtml = await _rp({ url: link });
-    let $ = _cheerio.load(pageHtml);
-    return getHeadsets($);
+async function getSearchAppPageData(appUrl) {
+    let appPageHtml = await _rp({ url: appUrl });
+    let $ = _cheerio.load(appPageHtml);
+
+    let gameElements = Array.from($('#game_area_purchase .game_area_purchase_game'));
+    if (gameElements.length < 1) {
+        return {
+            error: true,
+            message: "Could not find any game elements."
+        };
+    }
+
+    let firstGame = gameElements[0];
+    let countdown = getCountdown(firstGame);
+    let headsets = getHeadsets($);
+
+    return {
+        countdown,
+        headsets
+    };
+}
+
+function getCountdown(gameElement) {
+    let $ = _cheerio.load(gameElement);
+
+    let text = "";
+    let time = 0;
+
+    try {
+        text = $('.game_purchase_discount_countdown').text().trim();
+    } catch { };
+
+
+    try {
+        let countdownScript = $('.game_area_purchase_game > script')[0].children[0].data;
+        let countdownTimeText = extractDiscountCountdown(countdownScript);
+        time = parseInt(countdownTimeText);
+    } catch { };
+
+    return {
+        text,
+        time
+    }
 }
 
 async function getGameDataFromSearchResult(searchResult) {
@@ -151,8 +190,6 @@ function getGameDataFromGameElement(gameElement) {
     let $ = _cheerio.load(gameElement);
 
     let title = "";
-    let countdownText = "";
-    let countdownTime = "";
     let price = "";
     let discounted = false;
     let originalPrice = "";
@@ -165,17 +202,6 @@ function getGameDataFromGameElement(gameElement) {
         }
     }
 
-    try {
-        countdownText = $('.game_purchase_discount_countdown').text().trim();
-    } catch { };
-
-
-    try {
-        let countdownScript = $('.game_area_purchase_game > script')[0].children[0].data;
-        let countdownTimeText = extractDiscountCountdown(countdownScript);
-        countdownTime = parseInt(countdownTimeText);
-    } catch { };
-
     originalPrice = $('.discount_original_price').text().trim();
     percentOff = extractPercent($('.discount_pct').text().trim());
 
@@ -187,8 +213,6 @@ function getGameDataFromGameElement(gameElement) {
 
     return {
         title,
-        countdownText,
-        countdownTime,
         originalPrice,
         discounted,
         price,
@@ -198,6 +222,6 @@ function getGameDataFromGameElement(gameElement) {
 
 module.exports = {
     getAppPageData,
-    getHeadsetsFromAppPage,
+    getSearchAppPageData,
     getSearchPageData
 };
