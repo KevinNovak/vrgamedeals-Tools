@@ -156,6 +156,29 @@ async function retrieveSteamSearchTable() {
     retrieveSearchButton.disabled = false;
 }
 
+function formatAppData(app) {
+    let platform = app.headsets.map(platform => getHeadsetAbbreviation(platform)).join('/');
+    let title = escapePipes(app.title);
+    let link = app.link;
+    let price = extractNumberFromPrice(app.price) || app.price || "";
+    let percentOff = extractNumberFromPercent(app.percentOff) || app.percentOff || "";
+    let reviews = extractNumberFromPercent(app.reviewsPercent) || app.reviewsPercent || "";
+    let reviewsCount = app.reviewsCount || "";
+
+    let bundlePrefix = app.type == "BUNDLE" ? "**Bundle** - " : "";
+    title = `${bundlePrefix}[${title}](${link})`;
+
+    return {
+        platform,
+        title,
+        link,
+        price,
+        percentOff,
+        reviews,
+        reviewsCount
+    }
+}
+
 async function retrieveSearchPageData(steamSearchUrl, pageNumber) {
     let content = {
         url: `${steamSearchUrl}`
@@ -172,17 +195,8 @@ function createMarkdownTable(searchData) {
     let result = header + NEW_LINE + divider + NEW_LINE;
 
     for (let app of searchData) {
-        let platform = app.headsets.map(platform => getHeadsetAbbreviation(platform)).join('/');
-        let title = escapePipes(app.title);
-        let link = app.link;
-        let price = extractNumberFromPrice(app.price) || app.price || "";
-        let percentOff = extractNumberFromPercent(app.percentOff) || app.percentOff || "";
-        let reviews = extractNumberFromPercent(app.reviewsPercent) || app.reviewsPercent || "";
-        let reviewsCount = app.reviewsCount || "";
-
-        let bundlePrefix = app.type == "BUNDLE" ? "**Bundle** - " : "";
-
-        result += `| ${platform} | ${bundlePrefix}[${title}](${link}) | ${price} | ${percentOff} | ${reviews} | ${reviewsCount} |` + NEW_LINE;
+        let formatted = formatAppData(app);
+        result += `| ${formatted.platform} | ${formatted.title} | ${formatted.price} | ${formatted.percentOff} | ${formatted.reviews} | ${formatted.reviewsCount} |` + NEW_LINE;
     }
 
     return result;
