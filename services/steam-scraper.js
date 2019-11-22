@@ -38,7 +38,7 @@ async function getSearchAppPageData(appUrl) {
         };
     }
 
-    let countdown = getCountdown(firstGame);
+    let countdown = getCountdownFromGameElement(firstGame);
     let headsets = getHeadsets($);
 
     return {
@@ -69,6 +69,14 @@ async function getAppPageData(appUrl) {
     };
 }
 
+function getMainGameElement($) {
+    let gameElements = Array.from($('#game_area_purchase .game_area_purchase_game'));
+    if (gameElements.length < 1) {
+        return;
+    }
+    return gameElements[0];
+}
+
 function getHeadsets($) {
     let headsetTitleElement = $('.details_block.vrsupport > div:contains("Headsets")').parent();
     let headsetElements = Array.from(headsetTitleElement.nextUntil('.details_block'));
@@ -83,36 +91,6 @@ function getHeadsets($) {
     }
 
     return headsets;
-}
-
-function getMainGameElement($) {
-    let gameElements = Array.from($('#game_area_purchase .game_area_purchase_game'));
-    if (gameElements.length < 1) {
-        return;
-    }
-    return gameElements[0];
-}
-
-function getCountdown(gameElement) {
-    let $ = _cheerio.load(gameElement);
-
-    let countdownData = {
-        text: "",
-        time: 0
-    }
-
-    try {
-        countdownData.text = $('.game_purchase_discount_countdown').text().trim();
-    } catch { };
-
-
-    try {
-        let countdownScript = $('.game_area_purchase_game > script')[0].children[0].data;
-        let countdownTimeText = _regexUtils.extractDiscountCountdown(countdownScript);
-        countdownData.time = parseInt(countdownTimeText);
-    } catch { };
-
-    return countdownData;
 }
 
 async function getGameDataFromSearchResult(searchResult) {
@@ -179,6 +157,28 @@ function getGameDataFromGameElement(gameElement) {
     gameData.price = gameData.originalPrice ? $('.discount_final_price').text().trim() : $('.game_purchase_price').text().trim();;
 
     return gameData;
+}
+
+function getCountdownFromGameElement(gameElement) {
+    let $ = _cheerio.load(gameElement);
+
+    let countdownData = {
+        text: "",
+        time: 0
+    }
+
+    try {
+        countdownData.text = $('.game_purchase_discount_countdown').text().trim();
+    } catch { };
+
+
+    try {
+        let countdownScript = $('.game_area_purchase_game > script')[0].children[0].data;
+        let countdownTimeText = _regexUtils.extractDiscountCountdown(countdownScript);
+        countdownData.time = parseInt(countdownTimeText);
+    } catch { };
+
+    return countdownData;
 }
 
 module.exports = {
