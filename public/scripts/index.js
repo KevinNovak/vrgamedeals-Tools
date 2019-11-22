@@ -57,24 +57,17 @@ async function retrieveSteamAppTitle() {
     try {
         let appData = await post('./api/app-scrape', content);
 
-        let discounted = appData.discounted;
-        let isVr = appData.headsets.length > 0;
+        let text = "";
+        if (appData.headsets.length > 0) {
+            let platforms = getPlatformText(appData.headsets);
+            text += `[${platforms}] `
+        }
+        text += `${appData.title} `
+        let priceTag = appData.percentOff ? `(${appData.price} / ${appData.percentOff} off)` : `(${appData.price})`;
+        text += `${priceTag}`
 
         let link = document.createElement('a');
-        if (isVr) {
-            let platforms = getPlatformText(appData.headsets);
-            if (discounted) {
-                link.innerText = `[${platforms}] ${appData.title} (${appData.price} / ${appData.percentOff} off)`;
-            } else {
-                link.innerText = `[${platforms}] ${appData.title} (${appData.price})`;
-            }
-        } else {
-            if (discounted) {
-                link.innerText = `${appData.title} (${appData.price} / ${appData.percentOff} off)`;
-            } else {
-                link.innerText = `${appData.title} (${appData.price})`;
-            }
-        }
+        link.innerText = text;
         link.href = appData.link;
         link.target = '_blank';
         link.style.display = 'inline';
