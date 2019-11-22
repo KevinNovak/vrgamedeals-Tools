@@ -139,8 +139,12 @@ async function retrieveSteamSearchTable() {
                 };
 
                 let appData = await post('./api/search-app-scrape', content);
-                app.headsets = appData.headsets;
-                app.countdown = appData.countdown;
+                app.headsets = appData.headsets || [];
+                app.countdown = appData.countdown || { text: "", time: 0 };
+            } else {
+                app.headsets = [];
+                app.countdown.text = "";
+                app.countdown.time = 0;
             }
         }
 
@@ -210,15 +214,15 @@ async function retrieveSearchPageData(steamSearchUrl, pageNumber) {
 }
 
 function createMarkdownTable(searchData) {
-    let header = '| Platform | Title | Price (USD) | Discount (%) | Rating (%) | Review Count |';
-    let divider = '| :- | :- | -: | -: | -: | -: |';
+    let header = '| Platform | Title | Price (USD) | Discount (%) | Rating (%) | Review Count | Text | Time |';
+    let divider = '| :- | :- | -: | -: | -: | -: | | |';
     let result = header + NEW_LINE + divider + NEW_LINE;
 
     let formattedData = [];
 
     for (let app of searchData) {
         let formatted = formatAppData(app);
-        result += `| ${formatted.platformAbbreviated} | ${formatted.titleLink} | ${formatted.price} | ${formatted.percentOff} | ${formatted.reviews} | ${formatted.reviewsCount} |` + NEW_LINE;
+        result += `| ${formatted.platformAbbreviated} | ${formatted.titleLink} | ${formatted.price} | ${formatted.percentOff} | ${formatted.reviews} | ${formatted.reviewsCount} | ${formatted.countdownText} | ${formatted.countdownTime}` + NEW_LINE;
         formattedData.push(formatted);
     }
 

@@ -14,15 +14,14 @@ async function getAppPageData(appUrl) {
     let appPageHtml = await _rp({ url: appUrl });
     let $ = _cheerio.load(appPageHtml);
 
-    let gameElements = Array.from($('#game_area_purchase .game_area_purchase_game'));
-    if (gameElements.length < 1) {
+    let firstGame = getMainGameElement($);
+    if (!firstGame) {
         return {
             error: true,
             message: "Could not find any game elements."
         };
     }
 
-    let firstGame = gameElements[0];
     let gameData = getGameDataFromGameElement(firstGame);
     let headsets = getHeadsets($);
 
@@ -66,19 +65,26 @@ function getHeadsets($) {
     return headsets;
 }
 
+function getMainGameElement($) {
+    let gameElements = Array.from($('#game_area_purchase .game_area_purchase_game'));
+    if (gameElements.length < 1) {
+        return;
+    }
+    return gameElements[0];
+}
+
 async function getSearchAppPageData(appUrl) {
     let appPageHtml = await _rp({ url: appUrl });
     let $ = _cheerio.load(appPageHtml);
 
-    let gameElements = Array.from($('#game_area_purchase .game_area_purchase_game'));
-    if (gameElements.length < 1) {
+    let firstGame = getMainGameElement($);
+    if (!firstGame) {
         return {
             error: true,
             message: "Could not find any game elements."
         };
     }
 
-    let firstGame = gameElements[0];
     let countdown = getCountdown(firstGame);
     let headsets = getHeadsets($);
 
