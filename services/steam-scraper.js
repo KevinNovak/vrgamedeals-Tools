@@ -1,5 +1,6 @@
 const _cheerio = require('cheerio');
 const _rp = require('request-promise');
+const _regexUtils = require('../utils/regex-utils');
 
 const TITLE_REMOVE = [
     'Buy',
@@ -8,10 +9,6 @@ const TITLE_REMOVE = [
     'Install',
     'Pre-Purchase'
 ];
-
-const PERCENT_REGEX = /(\d+%)/;
-const REVIEWS_COUNT_REGEX = /([\d,]+) user review/;
-const DISCOUNT_COUNTDOWN_REGEX = /DiscountCountdown,[ ]*([\d]{7,})/;
 
 async function getAppPageData(appUrl) {
     let appPageHtml = await _rp({ url: appUrl });
@@ -50,26 +47,7 @@ async function getSearchPageData(searchUrl) {
     return searchPageData;
 }
 
-function extractPercent(input) {
-    let match = PERCENT_REGEX.exec(input);
-    if (match) {
-        return match[1];
-    }
-}
 
-function extractReviewsCount(input) {
-    let match = REVIEWS_COUNT_REGEX.exec(input);
-    if (match) {
-        return match[1];
-    }
-}
-
-function extractDiscountCountdown(input) {
-    let match = DISCOUNT_COUNTDOWN_REGEX.exec(input);
-    if (match) {
-        return match[1];
-    }
-}
 
 function stripQueryString(url) {
     return url.split(/[?#]/)[0];
@@ -123,7 +101,7 @@ function getCountdown(gameElement) {
 
     try {
         let countdownScript = $('.game_area_purchase_game > script')[0].children[0].data;
-        let countdownTimeText = extractDiscountCountdown(countdownScript);
+        let countdownTimeText = _regexUtils.extractDiscountCountdown(countdownScript);
         time = parseInt(countdownTimeText);
     } catch { };
 
@@ -157,7 +135,7 @@ async function getGameDataFromSearchResult(searchResult) {
 
     price = $('div.search_price').clone().children().remove().end().text().trim();
     originalPrice = $('div.search_price > span > strike').text().trim();
-    percentOff = extractPercent($('div.search_discount > span').text().trim());
+    percentOff = _regexUtils.extractPercent($('div.search_discount > span').text().trim());
 
     if (originalPrice && percentOff) {
         discounted = true;
@@ -168,8 +146,8 @@ async function getGameDataFromSearchResult(searchResult) {
 
         if (reviewsSummary) {
             reviewsSummary = reviewsSummary.trim();
-            reviewsPercent = extractPercent(reviewsSummary);
-            reviewsCount = extractReviewsCount(reviewsSummary).replace(/,/g, '');
+            reviewsPercent = _regexUtils.extractPercent(reviewsSummary);
+            reviewsCount = _regexUtils.extractReviewsCount(reviewsSummary).replace(/,/g, '');
         }
     }
 
@@ -203,7 +181,7 @@ function getGameDataFromGameElement(gameElement) {
     }
 
     originalPrice = $('.discount_original_price').text().trim();
-    percentOff = extractPercent($('.discount_pct').text().trim());
+    percentOff = _regexUtils.extractPercent($('.discount_pct').text().trim());
 
     if (originalPrice && percentOff) {
         discounted = true;
