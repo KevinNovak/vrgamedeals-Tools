@@ -72,13 +72,16 @@ async function getAppPageData(appUrl) {
 function getHeadsets($) {
     let headsetTitleElement = $('.details_block.vrsupport > div:contains("Headsets")').parent();
     let headsetElements = Array.from(headsetTitleElement.nextUntil('.details_block'));
+
     let headsets = [];
+
     for (var headsetElement of headsetElements) {
         let headsetName = $('.name', headsetElement).text().trim();
         if (headsetName) {
             headsets.push(headsetName);
         }
     }
+
     return headsets;
 }
 
@@ -93,111 +96,89 @@ function getMainGameElement($) {
 function getCountdown(gameElement) {
     let $ = _cheerio.load(gameElement);
 
-    let text = "";
-    let time = 0;
+    let countdownData = {
+        text: "",
+        time: 0
+    }
 
     try {
-        text = $('.game_purchase_discount_countdown').text().trim();
+        countdownData.text = $('.game_purchase_discount_countdown').text().trim();
     } catch { };
 
 
     try {
         let countdownScript = $('.game_area_purchase_game > script')[0].children[0].data;
         let countdownTimeText = _regexUtils.extractDiscountCountdown(countdownScript);
-        time = parseInt(countdownTimeText);
+        countdownData.time = parseInt(countdownTimeText);
     } catch { };
 
-    return {
-        text,
-        time
-    }
+    return countdownData;
 }
 
 async function getGameDataFromSearchResult(searchResult) {
     let $ = _cheerio.load(searchResult);
 
-    let title = "";
-    let link = "";
-    let type = "UNKNOWN";
-    let price = "";
-    let discounted = false;
-    let originalPrice = "";
-    let percentOff = "";
-    let reviewsPercent = "";
-    let reviewsCount = "";
-
-    title = $('div.search_name > span.title').text().trim();
-    link = _stringUtils.stripQueryString(searchResult.attribs.href);
-
-    if (link.includes('/app/')) {
-        type = "APP";
-    } else if (link.includes('/bundle/')) {
-        type = "BUNDLE";
+    let gameData = {
+        title: "",
+        link: "",
+        type: "UNKNOWN",
+        originalPrice: "",
+        price: "",
+        percentOff: "",
+        reviewsPercent: "",
+        reviewsCount: ""
     }
 
-    price = $('div.search_price').clone().children().remove().end().text().trim();
-    originalPrice = $('div.search_price > span > strike').text().trim();
-    percentOff = _regexUtils.extractPercent($('div.search_discount > span').text().trim());
+    gameData.title = $('div.search_name > span.title').text().trim();
+    gameData.link = _stringUtils.stripQueryString(searchResult.attribs.href);
 
-    if (originalPrice && percentOff) {
-        discounted = true;
+    if (gameData.link.includes('/app/')) {
+        gameData.type = "APP";
+    } else if (gameData.link.includes('/bundle/')) {
+        gameData.type = "BUNDLE";
     }
 
-    if (type == "APP") {
+    gameData.price = $('div.search_price').clone().children().remove().end().text().trim();
+    gameData.originalPrice = $('div.search_price > span > strike').text().trim();
+    gameData.percentOff = _regexUtils.extractPercent($('div.search_discount > span').text().trim());
+
+    if (gameData.type == "APP") {
         let reviewsSummary = $('div.search_reviewscore > span.search_review_summary').attr('data-tooltip-html');
 
         if (reviewsSummary) {
             reviewsSummary = reviewsSummary.trim();
-            reviewsPercent = _regexUtils.extractPercent(reviewsSummary);
-            reviewsCount = _regexUtils.extractReviewsCount(reviewsSummary).replace(/,/g, '');
+            gameData.reviewsPercent = _regexUtils.extractPercent(reviewsSummary);
+            gameData.reviewsCount = _regexUtils.extractReviewsCount(reviewsSummary).replace(/,/g, '');
         }
     }
 
-    return {
-        title,
-        link,
-        type,
-        originalPrice,
-        discounted,
-        price,
-        percentOff,
-        reviewsPercent,
-        reviewsCount,
-    };
+    return gameData;
 }
 
 function getGameDataFromGameElement(gameElement) {
     let $ = _cheerio.load(gameElement);
 
-    let title = "";
-    let price = "";
-    let discounted = false;
-    let originalPrice = "";
-    let percentOff = "";
+    let gameData = {
+        title: "",
+        originalPrice: "",
+        price: "",
+        percentOff: ""
+    }
 
-    title = $('.game_area_purchase_game > h1').children().remove().end().text().trim();
+    let title = $('.game_area_purchase_game > h1').children().remove().end().text().trim();
     for (var removeKeyword of TITLE_REMOVE) {
         if (title.startsWith(removeKeyword)) {
             title = title.substr(removeKeyword.length).trim();
         }
     }
+    gameData.title = title;
 
-    originalPrice = $('.discount_original_price').text().trim();
-    percentOff = _regexUtils.extractPercent($('.discount_pct').text().trim());
+    gameData.originalPrice = $('.discount_original_price').text().trim();
+    gameData.percentOff = _regexUtils.extractPercent($('.discount_pct').text().trim());
 
-    if (originalPrice && percentOff) {
-        discounted = true;
-    }
+    gameData.price = gameData.originalPrice ? $('.discount_final_price').text().trim() : $('.game_purchase_price').text().trim();;
 
-    price = discounted ? $('.discount_final_price').text().trim() : $('.game_purchase_price').text().trim();;
-
-    return {
-        title,
-        originalPrice,
-        discounted,
-        price,
-        percentOff
-    };
+    return gameData;
 }
 
 module.exports = {
