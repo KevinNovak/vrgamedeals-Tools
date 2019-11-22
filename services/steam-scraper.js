@@ -99,11 +99,11 @@ async function getGameDataFromSearchResult(searchResult) {
     let $ = _cheerio.load(searchResult);
 
     let gameData = {
-        title: "",
         link: "",
+        title: "",
         type: "UNKNOWN",
-        originalPrice: "",
         price: "",
+        originalPrice: "",
         percentOff: "",
         reviewsPercent: "",
         reviewsCount: ""
@@ -165,8 +165,8 @@ function getGameDataFromGameElement(gameElement) {
 
     let gameData = {
         title: "",
-        originalPrice: "",
         price: "",
+        originalPrice: "",
         percentOff: ""
     }
 
