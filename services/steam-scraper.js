@@ -109,8 +109,8 @@ async function getGameDataFromSearchResult(searchResult) {
         reviewsCount: ""
     }
 
-    gameData.title = $('div.search_name > span.title').text().trim();
-    gameData.link = _stringUtils.stripQueryString(searchResult.attribs.href);
+    gameData.title = $('div.search_name > span.title').text().trim() || "";
+    gameData.link = _stringUtils.stripQueryString(searchResult.attribs.href) || "";
 
     if (gameData.link.includes('/app/')) {
         gameData.type = "APP";
@@ -118,17 +118,17 @@ async function getGameDataFromSearchResult(searchResult) {
         gameData.type = "BUNDLE";
     }
 
-    gameData.price = $('div.search_price').clone().children().remove().end().text().trim();
-    gameData.originalPrice = $('div.search_price > span > strike').text().trim();
-    gameData.percentOff = _regexUtils.extractPercent($('div.search_discount > span').text().trim());
+    gameData.price = $('div.search_price').clone().children().remove().end().text().trim() || "";
+    gameData.originalPrice = $('div.search_price > span > strike').text().trim() || "";
+    gameData.percentOff = _regexUtils.extractPercent($('div.search_discount > span').text().trim()) || "";
 
     if (gameData.type == "APP") {
         let reviewsSummary = $('div.search_reviewscore > span.search_review_summary').attr('data-tooltip-html');
 
         if (reviewsSummary) {
             reviewsSummary = reviewsSummary.trim();
-            gameData.reviewsPercent = _regexUtils.extractPercent(reviewsSummary);
-            gameData.reviewsCount = _regexUtils.extractReviewsCount(reviewsSummary).replace(/,/g, '');
+            gameData.reviewsPercent = _regexUtils.extractPercent(reviewsSummary) || "";
+            gameData.reviewsCount = _regexUtils.extractReviewsCount(reviewsSummary).replace(/,/g, '') || "";
         }
     }
 
@@ -151,12 +151,12 @@ function getGameDataFromGameElement(gameElement) {
             title = title.substr(removeKeyword.length).trim();
         }
     }
-    gameData.title = title;
+    gameData.title = title || "";
 
-    gameData.originalPrice = $('.discount_original_price').text().trim();
-    gameData.percentOff = _regexUtils.extractPercent($('.discount_pct').text().trim());
+    gameData.originalPrice = $('.discount_original_price').text().trim() || "";
+    gameData.percentOff = _regexUtils.extractPercent($('.discount_pct').text().trim()) || "";
 
-    gameData.price = gameData.originalPrice ? $('.discount_final_price').text().trim() : $('.game_purchase_price').text().trim();;
+    gameData.price = gameData.originalPrice ? $('.discount_final_price').text().trim() || "" : $('.game_purchase_price').text().trim() || "";
 
     return gameData;
 }
@@ -170,14 +170,14 @@ function getCountdownFromGameElement(gameElement) {
     }
 
     try {
-        countdownData.text = $('.game_purchase_discount_countdown').text().trim();
+        countdownData.text = $('.game_purchase_discount_countdown').text().trim() || "";
     } catch { };
 
 
     try {
         let countdownScript = $('.game_area_purchase_game > script')[0].children[0].data;
         let countdownTimeText = _regexUtils.extractDiscountCountdown(countdownScript);
-        countdownData.time = parseInt(countdownTimeText);
+        countdownData.time = parseInt(countdownTimeText) || 0;
     } catch { };
 
     return countdownData;
