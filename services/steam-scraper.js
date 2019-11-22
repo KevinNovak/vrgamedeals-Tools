@@ -72,7 +72,7 @@ async function getAppPageData(appUrl) {
 }
 
 function getMainGameElement($) {
-    let gameElements = Array.from($('#game_area_purchase .game_area_purchase_game'));
+    let gameElements = Array.from($('#game_area_purchase .game_area_purchase_game:not(.demo_above_purchase)'));
     if (gameElements.length < 1) {
         return;
     }
