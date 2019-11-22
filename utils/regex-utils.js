@@ -12,7 +12,7 @@ function extractPercent(input) {
 function extractReviewsCount(input) {
     let match = REVIEWS_COUNT_REGEX.exec(input);
     if (match) {
-        return match[1];
+        return match[1].replace(/,/g, '');
     }
 }
 
