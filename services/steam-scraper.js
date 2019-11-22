@@ -1,6 +1,7 @@
 const _cheerio = require('cheerio');
 const _rp = require('request-promise');
 const _regexUtils = require('../utils/regex-utils');
+const _stringUtils = require('../utils/string-utils');
 
 const TITLE_REMOVE = [
     'Buy',
@@ -9,6 +10,42 @@ const TITLE_REMOVE = [
     'Install',
     'Pre-Purchase'
 ];
+
+async function getSearchPageData(searchUrl) {
+    let searchPageHtml = await _rp({ url: searchUrl });
+    let $ = _cheerio.load(searchPageHtml);
+
+    let searchResults = Array.from($('#search_resultsRows > a.search_result_row'));
+
+    let searchPageData = [];
+    for (var searchResult of searchResults) {
+        let gameData = await getGameDataFromSearchResult(searchResult);
+        searchPageData.push(gameData);
+    }
+    return searchPageData;
+}
+
+
+async function getSearchAppPageData(appUrl) {
+    let appPageHtml = await _rp({ url: appUrl });
+    let $ = _cheerio.load(appPageHtml);
+
+    let firstGame = getMainGameElement($);
+    if (!firstGame) {
+        return {
+            error: true,
+            message: "Could not find any game elements."
+        };
+    }
+
+    let countdown = getCountdown(firstGame);
+    let headsets = getHeadsets($);
+
+    return {
+        countdown,
+        headsets
+    };
+}
 
 async function getAppPageData(appUrl) {
     let appPageHtml = await _rp({ url: appUrl });
@@ -32,26 +69,6 @@ async function getAppPageData(appUrl) {
     };
 }
 
-async function getSearchPageData(searchUrl) {
-    let searchPageHtml = await _rp({ url: searchUrl });
-    let $ = _cheerio.load(searchPageHtml);
-
-    let searchResults = Array.from($('#search_resultsRows > a.search_result_row'));
-
-    let searchPageData = [];
-    for (var searchResult of searchResults) {
-        let gameData = await getGameDataFromSearchResult(searchResult);
-        searchPageData.push(gameData);
-    }
-    return searchPageData;
-}
-
-
-
-function stripQueryString(url) {
-    return url.split(/[?#]/)[0];
-}
-
 function getHeadsets($) {
     let headsetTitleElement = $('.details_block.vrsupport > div:contains("Headsets")').parent();
     let headsetElements = Array.from(headsetTitleElement.nextUntil('.details_block'));
@@ -71,27 +88,6 @@ function getMainGameElement($) {
         return;
     }
     return gameElements[0];
-}
-
-async function getSearchAppPageData(appUrl) {
-    let appPageHtml = await _rp({ url: appUrl });
-    let $ = _cheerio.load(appPageHtml);
-
-    let firstGame = getMainGameElement($);
-    if (!firstGame) {
-        return {
-            error: true,
-            message: "Could not find any game elements."
-        };
-    }
-
-    let countdown = getCountdown(firstGame);
-    let headsets = getHeadsets($);
-
-    return {
-        countdown,
-        headsets
-    };
 }
 
 function getCountdown(gameElement) {
@@ -131,7 +127,7 @@ async function getGameDataFromSearchResult(searchResult) {
     let reviewsCount = "";
 
     title = $('div.search_name > span.title').text().trim();
-    link = stripQueryString(searchResult.attribs.href);
+    link = _stringUtils.stripQueryString(searchResult.attribs.href);
 
     if (link.includes('/app/')) {
         type = "APP";
