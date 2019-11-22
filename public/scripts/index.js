@@ -139,12 +139,14 @@ async function retrieveSteamSearchTable() {
                 };
 
                 let appData = await post('./api/search-app-scrape', content);
-                app.headsets = appData.headsets || [];
-                app.countdown = appData.countdown || { text: "", time: 0 };
+                app.headsets = appData.headsets;
+                app.countdown = appData.countdown;
             } else {
                 app.headsets = [];
-                app.countdown.text = "";
-                app.countdown.time = 0;
+                app.countdown = {
+                    text: "",
+                    time: 0
+                }
             }
         }
 
