@@ -125,15 +125,14 @@ async function retrieveSteamSearchTable() {
         for (let [index, app] of searchData.entries()) {
             let itemNumber = index + 1;
             searchResultsDiv.innerHTML = `Retrieving result ${itemNumber} of ${searchData.length}...`;
-            app.headsets = [];
             if (app.type == "APP") {
                 let content = {
                     url: app.link
                 };
 
                 let appData = await post('./api/search-app-scrape', content);
-                app.headsets = appData.headsets;
-                app.countdown = appData.countdown;
+                app.headsets = appData.headsets || [];
+                app.countdown = appData.countdown || { text: "", time: 0 };
             } else {
                 app.headsets = [];
                 app.countdown = {
@@ -162,40 +161,40 @@ async function retrieveSteamSearchTable() {
 }
 
 function formatAppData(app) {
-    let type = app.type;
-    let platform = app.headsets.join(', ');
-    let platformAbbreviated = app.headsets.map(platform => getHeadsetAbbreviation(platform)).join('/');
-    let title = app.title;
-    let titleLink = escapePipes(app.title);
-    let link = app.link;
-    let price = extractNumberFromPrice(app.price) || app.price || "";
-    let originalPrice = extractNumberFromPrice(app.originalPrice) || app.price || "";
-    let discounted = app.discounted;
-    let percentOff = extractNumberFromPercent(app.percentOff) || app.percentOff || "";
-    let countdownText = app.countdown.text;
-    let countdownTime = app.countdown.time;
-    let reviews = extractNumberFromPercent(app.reviewsPercent) || app.reviewsPercent || "";
-    let reviewsCount = app.reviewsCount || "";
+    let formattedData = {
+        type: "",
+        platform: "",
+        platformAbbreviated: "",
+        title: "",
+        titleLink: "",
+        link: "",
+        price: "",
+        originalPrice: "",
+        percentOff: "",
+        countdownText: "",
+        countdownTime: 0,
+        reviews: "",
+        reviewsCount: ""
+    }
+
+    formattedData.type = app.type;
+    formattedData.platform = app.headsets.join(', ');
+    formattedData.platformAbbreviated = app.headsets.map(platform => getHeadsetAbbreviation(platform)).join('/');
+    formattedData.title = app.title;
 
     let titlePrefix = app.type == "BUNDLE" ? BUNDLE_PREFIX : "";
-    titleLink = `${titlePrefix}[${titleLink}](${link})`;
+    formattedData.titleLink = `${titlePrefix}[${escapePipes(app.title)}](${app.link})`;
 
-    return {
-        type,
-        platform,
-        platformAbbreviated,
-        title,
-        titleLink,
-        link,
-        price,
-        originalPrice,
-        discounted,
-        percentOff,
-        countdownText,
-        countdownTime,
-        reviews,
-        reviewsCount
-    }
+    formattedData.link = app.link;
+    formattedData.price = extractNumberFromPrice(app.price) || app.price;
+    formattedData.originalPrice = extractNumberFromPrice(app.originalPrice) || app.price;
+    formattedData.percentOff = extractNumberFromPercent(app.percentOff) || app.percentOff;
+    formattedData.countdownText = app.countdown.text;
+    formattedData.countdownTime = app.countdown.time;
+    formattedData.reviews = extractNumberFromPercent(app.reviewsPercent) || app.reviewsPercent;
+    formattedData.reviewsCount = app.reviewsCount;
+
+    return formattedData;
 }
 
 async function retrieveSearchPageData(steamSearchUrl, pageNumber) {
@@ -209,15 +208,15 @@ async function retrieveSearchPageData(steamSearchUrl, pageNumber) {
 }
 
 function createMarkdownTable(searchData) {
-    let header = '| Platform | Title | Price (USD) | Discount (%) | Rating (%) | Review Count | Text | Time |';
-    let divider = '| :- | :- | -: | -: | -: | -: | | |';
+    let header = '| Platform | Title | Price (USD) | Discount (%) | Rating (%) | Review Count |';
+    let divider = '| :- | :- | -: | -: | -: | -: |';
     let result = header + NEW_LINE + divider + NEW_LINE;
 
     let formattedData = [];
 
     for (let app of searchData) {
         let formatted = formatAppData(app);
-        result += `| ${formatted.platformAbbreviated} | ${formatted.titleLink} | ${formatted.price} | ${formatted.percentOff} | ${formatted.reviews} | ${formatted.reviewsCount} | ${formatted.countdownText} | ${formatted.countdownTime}` + NEW_LINE;
+        result += `| ${formatted.platformAbbreviated} | ${formatted.titleLink} | ${formatted.price} | ${formatted.percentOff} | ${formatted.reviews} | ${formatted.reviewsCount} |` + NEW_LINE;
         formattedData.push(formatted);
     }
 
