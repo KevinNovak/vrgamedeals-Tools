@@ -6,7 +6,9 @@ const PERCENT_NUMBER_REGEX = /(\d+)%/;
 const NEW_LINE = '&#10';
 const MAX_PAGES = 100;
 
-const headsetAliases = {
+const BUNDLE_PREFIX = "**Bundle** - ";
+
+const HEADSET_ALIASES = {
     'Valve Index': {
         shortName: 'Index',
         abbreviation: 'I'
@@ -27,6 +29,10 @@ const headsetAliases = {
         shortName: 'WMR',
         abbreviation: 'W'
     }
+}
+
+let cache = {
+    searchData: []
 }
 
 async function retrieveSteamAppTitle() {
@@ -51,24 +57,17 @@ async function retrieveSteamAppTitle() {
     try {
         let appData = await post('./api/app-scrape', content);
 
-        let discounted = appData.discounted;
-        let isVr = appData.headsets.length > 0;
+        let text = "";
+        if (appData.headsets.length > 0) {
+            let platforms = getPlatformText(appData.headsets);
+            text += `[${platforms}] `
+        }
+        text += `${appData.title} `
+        let priceTag = appData.percentOff ? `(${appData.price} / ${appData.percentOff} off)` : `(${appData.price})`;
+        text += `${priceTag}`
 
         let link = document.createElement('a');
-        if (isVr) {
-            let platforms = getPlatformText(appData.headsets);
-            if (discounted) {
-                link.innerText = `[${platforms}] ${appData.title} (${appData.price} / ${appData.percentOff} off)`;
-            } else {
-                link.innerText = `[${platforms}] ${appData.title} (${appData.price})`;
-            }
-        } else {
-            if (discounted) {
-                link.innerText = `${appData.title} (${appData.price} / ${appData.percentOff} off)`;
-            } else {
-                link.innerText = `${appData.title} (${appData.price})`;
-            }
-        }
+        link.innerText = text;
         link.href = appData.link;
         link.target = '_blank';
         link.style.display = 'inline';
@@ -126,12 +125,20 @@ async function retrieveSteamSearchTable() {
         for (let [index, app] of searchData.entries()) {
             let itemNumber = index + 1;
             searchResultsDiv.innerHTML = `Retrieving result ${itemNumber} of ${searchData.length}...`;
-            app.headsets = [];
             if (app.type == "APP") {
                 let content = {
                     url: app.link
                 };
-                app.headsets = await post('./api/headset-scrape', content);
+
+                let appData = await post('./api/search-app-scrape', content);
+                app.headsets = appData.headsets || [];
+                app.countdown = appData.countdown || { text: "", time: 0 };
+            } else {
+                app.headsets = [];
+                app.countdown = {
+                    text: "",
+                    time: 0
+                }
             }
         }
 
@@ -143,14 +150,72 @@ async function retrieveSteamSearchTable() {
         textArea.readOnly = true;
         textArea.innerHTML = text;
 
+        let csv = json2csv.parse(cache.searchData);
+
+        let downloadLink = document.createElement('a');
+        downloadLink.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+        downloadLink.target = '_blank';
+        downloadLink.innerHTML = 'Download Raw Data as CSV';
+        downloadLink.download = `steam-data-${getFormattedTime()}.csv`;
+
         searchResultsDiv.innerHTML = "";
         searchResultsDiv.appendChild(textArea);
+        searchResultsDiv.appendChild(downloadLink);
     } catch (error) {
         console.error(error);
         searchResultsDiv.innerHTML = "No results.";
     }
 
     retrieveSearchButton.disabled = false;
+}
+
+function getFormattedTime() {
+    let today = new Date();
+    let y = today.getFullYear();
+    // JavaScript months are 0-based.
+    let m = today.getMonth() + 1;
+    let d = today.getDate();
+    let h = today.getHours();
+    let mi = today.getMinutes();
+    let s = today.getSeconds();
+    return y + "-" + m + "-" + d + "-" + h + "-" + mi + "-" + s;
+}
+
+function formatAppData(app) {
+    let formattedData = {
+        type: "",
+        platform: "",
+        platformAbbreviated: "",
+        title: "",
+        titleLink: "",
+        link: "",
+        price: "",
+        originalPrice: "",
+        percentOff: "",
+        countdownText: "",
+        countdownTime: 0,
+        reviews: "",
+        reviewsCount: ""
+    }
+
+    formattedData.type = app.type;
+    formattedData.platform = app.headsets.join(', ');
+    formattedData.platformAbbreviated = app.headsets.map(platform => getHeadsetAbbreviation(platform)).join('/');
+    formattedData.title = app.title;
+
+    let titlePrefix = app.type == "BUNDLE" ? BUNDLE_PREFIX : "";
+    formattedData.titleLink = `${titlePrefix}[${escapePipes(app.title)}](${app.link})`;
+
+    formattedData.link = app.link;
+    formattedData.price = extractNumberFromPrice(app.price) || app.price;
+    formattedData.originalPrice = extractNumberFromPrice(app.originalPrice) || app.price;
+    formattedData.percentOff = extractNumberFromPercent(app.percentOff) || app.percentOff;
+    formattedData.countdownText = app.countdown.text;
+    formattedData.countdownTime = app.countdown.time;
+    formattedData.reviews = extractNumberFromPercent(app.reviewsPercent) || app.reviewsPercent;
+    formattedData.reviewsCount = app.reviewsCount;
+
+    return formattedData;
 }
 
 async function retrieveSearchPageData(steamSearchUrl, pageNumber) {
@@ -168,19 +233,15 @@ function createMarkdownTable(searchData) {
     let divider = '| :- | :- | -: | -: | -: | -: |';
     let result = header + NEW_LINE + divider + NEW_LINE;
 
+    let formattedData = [];
+
     for (let app of searchData) {
-        let platform = app.headsets.map(platform => getHeadsetAbbreviation(platform)).join('/');
-        let title = escapePipes(app.title);
-        let link = app.link;
-        let price = extractNumberFromPrice(app.price) || app.price || "";
-        let percentOff = extractNumberFromPercent(app.percentOff) || app.percentOff || "";
-        let reviews = extractNumberFromPercent(app.reviewsPercent) || app.reviewsPercent || "";
-        let reviewsCount = app.reviewsCount || "";
-
-        let bundlePrefix = app.type == "BUNDLE" ? "**Bundle** - " : "";
-
-        result += `| ${platform} | ${bundlePrefix}[${title}](${link}) | ${price} | ${percentOff} | ${reviews} | ${reviewsCount} |` + NEW_LINE;
+        let formatted = formatAppData(app);
+        result += `| ${formatted.platformAbbreviated} | ${formatted.titleLink} | ${formatted.price} | ${formatted.percentOff} | ${formatted.reviews} | ${formatted.reviewsCount} |` + NEW_LINE;
+        formattedData.push(formatted);
     }
+
+    cache.searchData = formattedData;
 
     return result;
 }
@@ -225,7 +286,7 @@ function getPlatformText(platforms) {
 }
 
 function getHeadsetshortName(headsetName) {
-    let headsetAlias = headsetAliases[headsetName];
+    let headsetAlias = HEADSET_ALIASES[headsetName];
     if (headsetAlias) {
         return headsetAlias.shortName;
     } else {
@@ -234,7 +295,7 @@ function getHeadsetshortName(headsetName) {
 }
 
 function getHeadsetAbbreviation(headsetName) {
-    let headsetAlias = headsetAliases[headsetName];
+    let headsetAlias = HEADSET_ALIASES[headsetName];
     if (headsetAlias) {
         return headsetAlias.abbreviation;
     } else {
