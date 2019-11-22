@@ -60,11 +60,13 @@ async function getAppPageData(appUrl) {
     }
 
     let gameData = getGameDataFromGameElement(firstGame);
+    let countdown = getCountdownFromGameElement(firstGame);
     let headsets = getHeadsets($);
 
     return {
         link: appUrl,
         ...gameData,
+        countdown,
         headsets
     };
 }
