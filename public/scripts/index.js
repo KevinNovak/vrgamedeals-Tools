@@ -150,14 +150,35 @@ async function retrieveSteamSearchTable() {
         textArea.readOnly = true;
         textArea.innerHTML = text;
 
+        let csv = json2csv.parse(cache.searchData);
+
+        let downloadLink = document.createElement('a');
+        downloadLink.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+        downloadLink.target = '_blank';
+        downloadLink.innerHTML = 'Download Raw Data as CSV';
+        downloadLink.download = `steam-data-${getFormattedTime()}.csv`;
+
         searchResultsDiv.innerHTML = "";
         searchResultsDiv.appendChild(textArea);
+        searchResultsDiv.appendChild(downloadLink);
     } catch (error) {
         console.error(error);
         searchResultsDiv.innerHTML = "No results.";
     }
 
     retrieveSearchButton.disabled = false;
+}
+
+function getFormattedTime() {
+    let today = new Date();
+    let y = today.getFullYear();
+    // JavaScript months are 0-based.
+    let m = today.getMonth() + 1;
+    let d = today.getDate();
+    let h = today.getHours();
+    let mi = today.getMinutes();
+    let s = today.getSeconds();
+    return y + "-" + m + "-" + d + "-" + h + "-" + mi + "-" + s;
 }
 
 function formatAppData(app) {

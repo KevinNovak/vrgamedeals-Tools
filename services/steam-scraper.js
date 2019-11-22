@@ -18,7 +18,7 @@ async function getSearchPageData(searchUrl) {
     let searchResults = Array.from($('#search_resultsRows > a.search_result_row'));
 
     let searchPageData = [];
-    for (var searchResult of searchResults) {
+    for (let searchResult of searchResults) {
         let gameData = await getGameDataFromSearchResult(searchResult);
         searchPageData.push(gameData);
     }
@@ -85,7 +85,7 @@ function getHeadsets($) {
 
     let headsets = [];
 
-    for (var headsetElement of headsetElements) {
+    for (let headsetElement of headsetElements) {
         let headsetName = $('.name', headsetElement).text().trim();
         if (headsetName) {
             headsets.push(headsetName);
@@ -171,7 +171,7 @@ function getGameDataFromGameElement(gameElement) {
     }
 
     let title = $('.game_area_purchase_game > h1').children().remove().end().text().trim();
-    for (var removeKeyword of TITLE_REMOVE) {
+    for (let removeKeyword of TITLE_REMOVE) {
         if (title.startsWith(removeKeyword)) {
             title = title.substr(removeKeyword.length).trim();
         }
