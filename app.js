@@ -90,7 +90,7 @@ function main() {
     });
 
     _app.listen(PORT, () => {
-        console.log(`App listening on port ${PORT}!`);
+        _logger.info(`App listening on port ${PORT}!`);
     });
 }
 
