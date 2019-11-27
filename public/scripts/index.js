@@ -151,10 +151,12 @@ async function retrieveSteamSearchTable() {
         textArea.readOnly = true;
         textArea.innerHTML = text;
 
-        let csv = json2csv.parse(cache.searchData);
+        let csvString = "\ufeff" + json2csv.parse(cache.searchData);
+        let csvData = new Blob([csvString], { encoding: 'UTF-8', type: 'text/csv;charset=UTF-8' });
+        let csvUrl = URL.createObjectURL(csvData);
 
         let downloadLink = document.createElement('a');
-        downloadLink.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+        downloadLink.href = csvUrl;
         downloadLink.target = '_blank';
         downloadLink.innerHTML = 'Download Raw Data as CSV';
         downloadLink.download = `steam-data-${getFormattedTime()}.csv`;
