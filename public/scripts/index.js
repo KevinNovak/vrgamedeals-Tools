@@ -1,5 +1,5 @@
-const STEAM_APP_URL_REGEX = /https:\/\/store.steampowered.com\/app\/\d+/;
-const STEAM_SEARCH_URL_REGEX = /https:\/\/store.steampowered.com\/search\/\S*/;
+const STEAM_APP_URL_REGEX = /^https:\/\/store.steampowered.com\/app\/\d+/;
+const STEAM_SEARCH_URL_REGEX = /^https:\/\/store.steampowered.com\/search\/\S*/;
 const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
 const PERCENT_NUMBER_REGEX = /(\d+)%/;
 
