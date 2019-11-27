@@ -1,5 +1,5 @@
 const _cheerio = require('cheerio');
-const _rp = require('request-promise');
+const _httpClient = require('./http-client');
 const _regexUtils = require('../utils/regex-utils');
 const _stringUtils = require('../utils/string-utils');
 
@@ -12,7 +12,7 @@ const TITLE_REMOVE = [
 ];
 
 async function getSearchPageData(searchUrl) {
-    let searchPageHtml = await _rp({ url: searchUrl });
+    let searchPageHtml = await _httpClient.get(searchUrl);
     let $ = _cheerio.load(searchPageHtml);
 
     let searchResults = Array.from($('#search_resultsRows > a.search_result_row'));
@@ -27,7 +27,7 @@ async function getSearchPageData(searchUrl) {
 
 
 async function getSearchAppPageData(appUrl) {
-    let appPageHtml = await _rp({ url: appUrl });
+    let appPageHtml = await _httpClient.get(appUrl);
     let $ = _cheerio.load(appPageHtml);
 
     let firstGame = getMainGameElement($);
@@ -48,7 +48,7 @@ async function getSearchAppPageData(appUrl) {
 }
 
 async function getAppPageData(appUrl) {
-    let appPageHtml = await _rp({ url: appUrl });
+    let appPageHtml = await _httpClient.get(appUrl);
     let $ = _cheerio.load(appPageHtml);
 
     let firstGame = getMainGameElement($);
