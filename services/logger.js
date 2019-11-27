@@ -1,5 +1,8 @@
 function info(message) {
-    console.log(message);
+    console.log({
+        timestamp: Date.now(),
+        message
+    });
 }
 
 function error(error) {
