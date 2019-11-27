@@ -1,7 +1,7 @@
 const _cheerio = require('cheerio');
-const _httpClient = require('./http-client');
 const _regexUtils = require('../utils/regex-utils');
 const _stringUtils = require('../utils/string-utils');
+const { CustomException } = require('../models/exceptions');
 
 const TITLE_REMOVE = [
     'Buy',
@@ -11,57 +11,15 @@ const TITLE_REMOVE = [
     'Pre-Purchase'
 ];
 
-async function getSearchPageData(searchUrl) {
-    let searchPageHtml = await _httpClient.get(searchUrl);
-    let $ = _cheerio.load(searchPageHtml);
-
-    let searchResults = Array.from($('#search_resultsRows > a.search_result_row'));
-
-    let searchPageData = [];
-    for (let searchResult of searchResults) {
-        let gameData = await getGameDataFromSearchResult(searchResult);
-        searchPageData.push(gameData);
-    }
-    return searchPageData;
-}
-
-
-async function getSearchAppPageData(appUrl) {
-    let appPageHtml = await _httpClient.get(appUrl);
-    let $ = _cheerio.load(appPageHtml);
-
-    let firstGame = getMainGameElement($);
+function getAppPageData(appPageHtml) {
+    let firstGame = getMainGameElement(appPageHtml);
     if (!firstGame) {
-        return {
-            error: true,
-            message: "Could not find any game elements."
-        };
-    }
-
-    let countdown = getCountdownFromGameElement(firstGame);
-    let headsets = getHeadsets($);
-
-    return {
-        countdown,
-        headsets
-    };
-}
-
-async function getAppPageData(appUrl) {
-    let appPageHtml = await _httpClient.get(appUrl);
-    let $ = _cheerio.load(appPageHtml);
-
-    let firstGame = getMainGameElement($);
-    if (!firstGame) {
-        return {
-            error: true,
-            message: "Could not find any game elements."
-        };
+        throw new CustomException("NO_GAME_ELEMENTS", "Could not find any game elements.");
     }
 
     let gameData = getGameDataFromGameElement(firstGame);
     let countdown = getCountdownFromGameElement(firstGame);
-    let headsets = getHeadsets($);
+    let headsets = getHeadsets(appPageHtml);
 
     return {
         link: appUrl,
@@ -71,15 +29,51 @@ async function getAppPageData(appUrl) {
     };
 }
 
-function getMainGameElement($) {
+function getSearchPageData(searchPageHtml) {
+    let $ = _cheerio.load(searchPageHtml);
+
+    let searchResults = Array.from($('#search_resultsRows > a.search_result_row'));
+
+    let searchPageData = [];
+
+    for (let searchResult of searchResults) {
+        let gameData = getGameDataFromSearchResult(searchResult);
+        searchPageData.push(gameData);
+    }
+
+    return searchPageData;
+}
+
+
+function getSearchAppPageData(appPageHtml) {
+    let firstGame = getMainGameElement(appPageHtml);
+    if (!firstGame) {
+        throw new CustomException("NO_GAME_ELEMENTS", "Could not find any game elements.");
+    }
+
+    let countdown = getCountdownFromGameElement(firstGame);
+    let headsets = getHeadsets(appPageHtml);
+
+    return {
+        countdown,
+        headsets
+    };
+}
+
+function getMainGameElement(appPageHtml) {
+    let $ = _cheerio.load(appPageHtml);
+
     let gameElements = Array.from($('#game_area_purchase .game_area_purchase_game:not(.demo_above_purchase)'));
     if (gameElements.length < 1) {
         return;
     }
+
     return gameElements[0];
 }
 
-function getHeadsets($) {
+function getHeadsets(appPageHtml) {
+    let $ = _cheerio.load(appPageHtml);
+
     let headsetTitleElement = $('.details_block.vrsupport > div:contains("Headsets")').parent();
     let headsetElements = Array.from(headsetTitleElement.nextUntil('.details_block'));
 
@@ -95,7 +89,7 @@ function getHeadsets($) {
     return headsets;
 }
 
-async function getGameDataFromSearchResult(searchResult) {
+function getGameDataFromSearchResult(searchResult) {
     let $ = _cheerio.load(searchResult);
 
     let gameData = {

@@ -5,6 +5,7 @@ const PERCENT_NUMBER_REGEX = /(\d+)%/;
 
 const NEW_LINE = '&#10';
 const MAX_PAGES = 100;
+const MAX_RETRIES = 10;
 
 const BUNDLE_PREFIX = "**Bundle** - ";
 
@@ -247,17 +248,28 @@ function createMarkdownTable(searchData) {
 }
 
 async function post(url, content) {
-    let response = await fetch(
-        url,
-        {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(content)
-        });
+    let response;
+    for (i = 0; i < MAX_RETRIES; i++) {
+        response = await fetch(
+            url,
+            {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(content)
+            });
+        if (!shouldRetry(response.status)) {
+            break;
+        }
+    }
+
     return await response.json();
+}
+
+function shouldRetry(statusCode) {
+    return !((statusCode >= 200 && statusCode <= 299) || (statusCode >= 400 && statusCode <= 499));
 }
 
 function escapePipes(input) {
