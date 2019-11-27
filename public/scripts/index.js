@@ -1,10 +1,11 @@
-const STEAM_APP_URL_REGEX = /https:\/\/store.steampowered.com\/app\/\d+/;
-const STEAM_SEARCH_URL_REGEX = /https:\/\/store.steampowered.com\/search\/\S*/;
+const STEAM_APP_URL_REGEX = /^https:\/\/store.steampowered.com\/app\/\d+/;
+const STEAM_SEARCH_URL_REGEX = /^https:\/\/store.steampowered.com\/search\/\S*/;
 const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
 const PERCENT_NUMBER_REGEX = /(\d+)%/;
 
 const NEW_LINE = '&#10';
 const MAX_PAGES = 100;
+const MAX_RETRIES = 10;
 
 const BUNDLE_PREFIX = "**Bundle** - ";
 
@@ -68,7 +69,7 @@ async function retrieveSteamAppTitle() {
 
         let link = document.createElement('a');
         link.innerText = text;
-        link.href = appData.link;
+        link.href = steamAppUrl;
         link.target = '_blank';
         link.style.display = 'inline';
 
@@ -247,17 +248,28 @@ function createMarkdownTable(searchData) {
 }
 
 async function post(url, content) {
-    let response = await fetch(
-        url,
-        {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(content)
-        });
+    let response;
+    for (i = 0; i < MAX_RETRIES; i++) {
+        response = await fetch(
+            url,
+            {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(content)
+            });
+        if (!shouldRetry(response.status)) {
+            break;
+        }
+    }
+
     return await response.json();
+}
+
+function shouldRetry(statusCode) {
+    return !((statusCode >= 200 && statusCode <= 299) || (statusCode >= 400 && statusCode <= 499));
 }
 
 function escapePipes(input) {
