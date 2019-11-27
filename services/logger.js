@@ -3,7 +3,10 @@ function info(message) {
 }
 
 function error(error) {
-    console.log(`Error: ${error.message}}`);
+    console.log({
+        timestamp: Date.now(),
+        error: error.stack,
+    });
 }
 
 module.exports = {
