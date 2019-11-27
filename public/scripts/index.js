@@ -69,7 +69,7 @@ async function retrieveSteamAppTitle() {
 
         let link = document.createElement('a');
         link.innerText = text;
-        link.href = appData.link;
+        link.href = steamAppUrl;
         link.target = '_blank';
         link.style.display = 'inline';
 

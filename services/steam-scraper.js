@@ -22,7 +22,6 @@ function getAppPageData(appPageHtml) {
     let headsets = getHeadsets(appPageHtml);
 
     return {
-        link: appUrl,
         ...gameData,
         countdown,
         headsets
