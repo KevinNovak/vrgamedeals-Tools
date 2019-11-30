@@ -83,6 +83,10 @@ async function retrieveSteamAppTitle() {
     retrievePageButton.disabled = false;
 }
 
+async function retrieveOculusExperienceTitle() {
+    console.log("Retrieving...");
+}
+
 async function retrieveSteamSearchTable() {
     let searchResultsDiv = document.getElementById('search-results');
     let retrieveSearchButton = document.getElementById('retrieve-steam-search-table');

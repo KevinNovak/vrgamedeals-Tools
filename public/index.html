@@ -228,6 +228,45 @@
 
           <hr />
 
+          <div class="module">
+            <h3>Oculus Experience Titler</h3>
+            <h5>
+              Creates a title for a
+              <a
+                href="https://www.reddit.com/r/vrgamedeals/submit"
+                target="_blank"
+                >r/vrgamedeals link post</a
+              >
+              from an Oculus experience page.
+            </h5>
+            <label for="oculus-experience-url"
+              ><b>Oculus Experience URL</b></label
+            >
+            <div class="input-group mb-3">
+              <input
+                id="oculus-experience-url"
+                type="url"
+                class="form-control"
+                placeholder="https://www.oculus.com/experiences/rift/1368187813209608"
+              />
+              <div class="input-group-append">
+                <button
+                  id="retrieve-oculus-experience-title"
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  onclick="retrieveOculusExperienceTitle()"
+                >
+                  Retrieve
+                </button>
+              </div>
+            </div>
+            <div id="page-results">
+              <span>No results.</span>
+            </div>
+          </div>
+
+          <hr />
+
           <div class="text-center mb-5">
             Created by
             <a href="https://www.reddit.com/user/novakevin" target="_blank"
