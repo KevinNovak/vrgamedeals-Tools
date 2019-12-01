@@ -58,7 +58,6 @@ let steamSearchDownloadLink = document.getElementById(
 
 async function retrieveSteamAppTitle() {
     steamAppBtn.disabled = true;
-
     hideElement(steamAppResultLink);
     setUnhideElement(steamAppInfoSpan, "Retrieving...");
 
