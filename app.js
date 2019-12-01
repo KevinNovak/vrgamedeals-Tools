@@ -1,18 +1,18 @@
-const _express = require('express');
+const _express = require("express");
 const _app = _express();
-const _bodyParser = require('body-parser');
-const _httpClient = require('./services/http-client');
-const _steamScraper = require('./services/steam-scraper');
-const _logger = require('./services/logger');
+const _bodyParser = require("body-parser");
+const _httpClient = require("./services/http-client");
+const _steamScraper = require("./services/steam-scraper");
+const _logger = require("./services/logger");
 
 const PORT = process.env.PORT || 8080;
 
 function main() {
-    _app.use(_express.static('public'));
+    _app.use(_express.static("public"));
     _app.use(_bodyParser.urlencoded({ extended: false }));
     _app.use(_bodyParser.json());
 
-    _app.post('/api/app-scrape', async (req, res) => {
+    _app.post("/api/app-scrape", async (req, res) => {
         let appUrl = req.body.url;
 
         let appPageHtml;
@@ -40,7 +40,7 @@ function main() {
         }
     });
 
-    _app.post('/api/search-scrape', async (req, res) => {
+    _app.post("/api/search-scrape", async (req, res) => {
         let searchUrl = req.body.url;
         let searchPageHtml;
         try {
@@ -52,7 +52,9 @@ function main() {
         }
 
         try {
-            let searchPageData = _steamScraper.getSearchPageData(searchPageHtml);
+            let searchPageData = _steamScraper.getSearchPageData(
+                searchPageHtml
+            );
             res.status(200).json(searchPageData);
             return;
         } catch (error) {
@@ -62,7 +64,7 @@ function main() {
         }
     });
 
-    _app.post('/api/search-app-scrape', async (req, res) => {
+    _app.post("/api/search-app-scrape", async (req, res) => {
         let appUrl = req.body.url;
         let appPageHtml;
         try {
