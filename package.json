@@ -1,40 +1,40 @@
 {
-  "name": "vr-game-deals-tools",
-  "version": "1.0.0",
-  "description": "Tools for r/vrgamedeals",
-  "main": "app.js",
-  "scripts": {
-    "start": "node app.js",
-    "start-pm2": "pm2 start process.json",
-    "dev": "nodemon app.js"
-  },
-  "keywords": [
-    "deals",
-    "game",
-    "reality",
-    "virtual",
-    "vr",
-    "vrgamedeals"
-  ],
-  "author": "Kevin Novak",
-  "license": "MIT",
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "cheerio": "1.0.0-rc.3",
-    "express": "4.17.1",
-    "pm2": "^3.5.1",
-    "request": "2.88.0",
-    "request-promise": "4.2.4"
-  },
-  "devDependencies": {
-    "nodemon": "^1.19.4"
-  },
-  "homepage": "https://github.com/KevinNovak/vrgamedeals-Tools#readme",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/KevinNovak/vrgamedeals-Tools.git"
-  },
-  "bugs": {
-    "url": "https://github.com/KevinNovak/vrgamedeals-Tools/issues"
-  }
+    "name": "vr-game-deals-tools",
+    "version": "1.0.0",
+    "description": "Tools for r/vrgamedeals",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js",
+        "start-pm2": "pm2 start process.json",
+        "dev": "nodemon app.js"
+    },
+    "keywords": [
+        "deals",
+        "game",
+        "reality",
+        "virtual",
+        "vr",
+        "vrgamedeals"
+    ],
+    "author": "Kevin Novak",
+    "license": "MIT",
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "cheerio": "1.0.0-rc.3",
+        "express": "4.17.1",
+        "pm2": "^3.5.1",
+        "request": "2.88.0",
+        "request-promise": "4.2.4"
+    },
+    "devDependencies": {
+        "nodemon": "^1.19.4"
+    },
+    "homepage": "https://github.com/KevinNovak/vrgamedeals-Tools#readme",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/KevinNovak/vrgamedeals-Tools.git"
+    },
+    "bugs": {
+        "url": "https://github.com/KevinNovak/vrgamedeals-Tools/issues"
+    }
 }
