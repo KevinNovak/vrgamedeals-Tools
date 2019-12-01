@@ -1,20 +1,17 @@
-const _cheerio = require('cheerio');
-const _regexUtils = require('../utils/regex-utils');
-const _stringUtils = require('../utils/string-utils');
-const { CustomException } = require('../models/exceptions');
+const _cheerio = require("cheerio");
+const _regexUtils = require("../utils/regex-utils");
+const _stringUtils = require("../utils/string-utils");
+const { CustomException } = require("../models/exceptions");
 
-const TITLE_REMOVE = [
-    'Buy',
-    'Play',
-    'Download',
-    'Install',
-    'Pre-Purchase'
-];
+const TITLE_REMOVE = ["Buy", "Play", "Download", "Install", "Pre-Purchase"];
 
 function getAppPageData(appPageHtml) {
     let firstGame = getMainGameElement(appPageHtml);
     if (!firstGame) {
-        throw new CustomException("NO_GAME_ELEMENTS", "Could not find any game elements.");
+        throw new CustomException(
+            "NO_GAME_ELEMENTS",
+            "Could not find any game elements."
+        );
     }
 
     let gameData = getGameDataFromGameElement(firstGame);
@@ -31,7 +28,9 @@ function getAppPageData(appPageHtml) {
 function getSearchPageData(searchPageHtml) {
     let $ = _cheerio.load(searchPageHtml);
 
-    let searchResults = Array.from($('#search_resultsRows > a.search_result_row'));
+    let searchResults = Array.from(
+        $("#search_resultsRows > a.search_result_row")
+    );
 
     let searchPageData = [];
 
@@ -43,11 +42,13 @@ function getSearchPageData(searchPageHtml) {
     return searchPageData;
 }
 
-
 function getSearchAppPageData(appPageHtml) {
     let firstGame = getMainGameElement(appPageHtml);
     if (!firstGame) {
-        throw new CustomException("NO_GAME_ELEMENTS", "Could not find any game elements.");
+        throw new CustomException(
+            "NO_GAME_ELEMENTS",
+            "Could not find any game elements."
+        );
     }
 
     let countdown = getCountdownFromGameElement(firstGame);
@@ -62,7 +63,11 @@ function getSearchAppPageData(appPageHtml) {
 function getMainGameElement(appPageHtml) {
     let $ = _cheerio.load(appPageHtml);
 
-    let gameElements = Array.from($('#game_area_purchase .game_area_purchase_game:not(.demo_above_purchase)'));
+    let gameElements = Array.from(
+        $(
+            "#game_area_purchase .game_area_purchase_game:not(.demo_above_purchase)"
+        )
+    );
     if (gameElements.length < 1) {
         return;
     }
@@ -73,13 +78,19 @@ function getMainGameElement(appPageHtml) {
 function getHeadsets(appPageHtml) {
     let $ = _cheerio.load(appPageHtml);
 
-    let headsetTitleElement = $('.details_block.vrsupport > div:contains("Headsets")').parent();
-    let headsetElements = Array.from(headsetTitleElement.nextUntil('.details_block'));
+    let headsetTitleElement = $(
+        '.details_block.vrsupport > div:contains("Headsets")'
+    ).parent();
+    let headsetElements = Array.from(
+        headsetTitleElement.nextUntil(".details_block")
+    );
 
     let headsets = [];
 
     for (let headsetElement of headsetElements) {
-        let headsetName = $('.name', headsetElement).text().trim();
+        let headsetName = $(".name", headsetElement)
+            .text()
+            .trim();
         if (headsetName) {
             headsets.push(headsetName);
         }
@@ -100,9 +111,11 @@ function getGameDataFromSearchResult(searchResult) {
         percentOff: "",
         reviewsPercent: "",
         reviewsCount: ""
-    }
+    };
 
-    let title = $('div.search_name > span.title').text().trim();
+    let title = $("div.search_name > span.title")
+        .text()
+        .trim();
     if (title) {
         gameData.title = title;
     }
@@ -112,29 +125,43 @@ function getGameDataFromSearchResult(searchResult) {
         gameData.link = link;
     }
 
-    if (gameData.link.includes('/app/')) {
+    if (gameData.link.includes("/app/")) {
         gameData.type = "APP";
-    } else if (gameData.link.includes('/bundle/')) {
+    } else if (gameData.link.includes("/bundle/")) {
         gameData.type = "BUNDLE";
     }
 
-    let price = $('div.search_price').clone().children().remove().end().text().trim();
+    let price = $("div.search_price")
+        .clone()
+        .children()
+        .remove()
+        .end()
+        .text()
+        .trim();
     if (price) {
         gameData.price = price;
     }
 
-    let originalPrice = $('div.search_price > span > strike').text().trim();
+    let originalPrice = $("div.search_price > span > strike")
+        .text()
+        .trim();
     if (originalPrice) {
         gameData.originalPrice = originalPrice;
     }
 
-    let percentOff = _regexUtils.extractPercent($('div.search_discount > span').text().trim());
+    let percentOff = _regexUtils.extractPercent(
+        $("div.search_discount > span")
+            .text()
+            .trim()
+    );
     if (percentOff) {
         gameData.percentOff = percentOff;
     }
 
     if (gameData.type == "APP") {
-        let reviewsSummary = $('div.search_reviewscore > span.search_review_summary').attr('data-tooltip-html');
+        let reviewsSummary = $(
+            "div.search_reviewscore > span.search_review_summary"
+        ).attr("data-tooltip-html");
 
         if (reviewsSummary) {
             reviewsSummary = reviewsSummary.trim();
@@ -161,9 +188,14 @@ function getGameDataFromGameElement(gameElement) {
         price: "",
         originalPrice: "",
         percentOff: ""
-    }
+    };
 
-    let title = $('.game_area_purchase_game > h1').children().remove().end().text().trim();
+    let title = $(".game_area_purchase_game > h1")
+        .children()
+        .remove()
+        .end()
+        .text()
+        .trim();
     for (let removeKeyword of TITLE_REMOVE) {
         if (title.startsWith(removeKeyword)) {
             title = title.substr(removeKeyword.length).trim();
@@ -174,17 +206,29 @@ function getGameDataFromGameElement(gameElement) {
         gameData.title = title;
     }
 
-    let originalPrice = $('.discount_original_price').text().trim();
+    let originalPrice = $(".discount_original_price")
+        .text()
+        .trim();
     if (originalPrice) {
         gameData.originalPrice = originalPrice;
     }
 
-    let percentOff = _regexUtils.extractPercent($('.discount_pct').text().trim());
+    let percentOff = _regexUtils.extractPercent(
+        $(".discount_pct")
+            .text()
+            .trim()
+    );
     if (percentOff) {
         gameData.percentOff = percentOff;
     }
 
-    let price = gameData.originalPrice ? $('.discount_final_price').text().trim() : $('.game_purchase_price').text().trim();
+    let price = gameData.originalPrice
+        ? $(".discount_final_price")
+              .text()
+              .trim()
+        : $(".game_purchase_price")
+              .text()
+              .trim();
     if (price) {
         gameData.price = price;
     }
@@ -198,24 +242,28 @@ function getCountdownFromGameElement(gameElement) {
     let countdownData = {
         text: "",
         time: 0
-    }
+    };
 
     try {
-        let text = $('.game_purchase_discount_countdown').text().trim();
+        let text = $(".game_purchase_discount_countdown")
+            .text()
+            .trim();
         if (text) {
             countdownData.text = text;
         }
-    } catch { };
-
+    } catch {}
 
     try {
-        let countdownScript = $('.game_area_purchase_game > script')[0].children[0].data;
-        let countdownTimeText = _regexUtils.extractDiscountCountdown(countdownScript);
+        let countdownScript = $(".game_area_purchase_game > script")[0]
+            .children[0].data;
+        let countdownTimeText = _regexUtils.extractDiscountCountdown(
+            countdownScript
+        );
         let time = parseInt(countdownTimeText);
         if (time) {
             countdownData.time = time;
         }
-    } catch { };
+    } catch {}
 
     return countdownData;
 }

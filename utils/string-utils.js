@@ -4,4 +4,4 @@ function stripQueryString(url) {
 
 module.exports = {
     stripQueryString
-}
+};
