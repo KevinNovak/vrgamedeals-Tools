@@ -2,12 +2,17 @@
     --placeholder-color: #ced4da;
 }
 
-.hidden {
-    display: none;
+hr {
+    width: 100%;
+    height: 1px;
 }
 
 textarea.search-result {
     min-height: 300px;
+}
+
+.hidden {
+    display: none;
 }
 
 .form-control::-webkit-input-placeholder {
