@@ -2,6 +2,11 @@
     --placeholder-color: #ced4da;
 }
 
+hr {
+    width: 100%;
+    height: 1px;
+}
+
 textarea.search-result {
     min-height: 300px;
 }
