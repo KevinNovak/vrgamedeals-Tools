@@ -15,4 +15,4 @@ function error(error) {
 module.exports = {
     info,
     error
-}
+};

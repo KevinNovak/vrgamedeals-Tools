@@ -30,11 +30,11 @@ const HEADSET_ALIASES = {
         shortName: 'WMR',
         abbreviation: 'W'
     }
-}
+};
 
 let cache = {
     searchData: []
-}
+};
 
 async function retrieveSteamAppTitle() {
     let retrievePageButton = document.getElementById('retrieve-steam-app-title');
@@ -53,7 +53,7 @@ async function retrieveSteamAppTitle() {
 
     let content = {
         url: steamAppUrl
-    }
+    };
 
     try {
         let appData = await post('./api/app-scrape', content);
@@ -61,11 +61,11 @@ async function retrieveSteamAppTitle() {
         let text = "";
         if (appData.headsets.length > 0) {
             let platforms = getPlatformText(appData.headsets);
-            text += `[${platforms}] `
+            text += `[${platforms}] `;
         }
-        text += `${appData.title} `
+        text += `${appData.title} `;
         let priceTag = appData.percentOff ? `(${appData.price} / ${appData.percentOff} off)` : `(${appData.price})`;
-        text += `${priceTag}`
+        text += `${priceTag}`;
 
         let link = document.createElement('a');
         link.innerText = text;
@@ -139,7 +139,7 @@ async function retrieveSteamSearchTable() {
                 app.countdown = {
                     text: "",
                     time: 0
-                }
+                };
             }
         }
 
@@ -199,7 +199,7 @@ function formatAppData(app) {
         countdownTime: 0,
         reviews: "",
         reviewsCount: ""
-    }
+    };
 
     formattedData.type = app.type;
     formattedData.platform = app.headsets.join(', ');
@@ -226,8 +226,8 @@ async function retrieveSearchPageData(steamSearchUrl, pageNumber) {
         url: `${steamSearchUrl}`
     };
     if (pageNumber) {
-        content.url += `&page=${pageNumber}`
-    };
+        content.url += `&page=${pageNumber}`;
+    }
     return await post('./api/search-scrape', content);
 }
 
@@ -251,7 +251,7 @@ function createMarkdownTable(searchData) {
 
 async function post(url, content) {
     let response;
-    for (i = 0; i < MAX_RETRIES; i++) {
+    for (let i = 0; i < MAX_RETRIES; i++) {
         response = await fetch(
             url,
             {

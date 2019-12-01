@@ -100,7 +100,7 @@ function getGameDataFromSearchResult(searchResult) {
         percentOff: "",
         reviewsPercent: "",
         reviewsCount: ""
-    }
+    };
 
     let title = $('div.search_name > span.title').text().trim();
     if (title) {
@@ -161,7 +161,7 @@ function getGameDataFromGameElement(gameElement) {
         price: "",
         originalPrice: "",
         percentOff: ""
-    }
+    };
 
     let title = $('.game_area_purchase_game > h1').children().remove().end().text().trim();
     for (let removeKeyword of TITLE_REMOVE) {
@@ -198,14 +198,14 @@ function getCountdownFromGameElement(gameElement) {
     let countdownData = {
         text: "",
         time: 0
-    }
+    };
 
     try {
         let text = $('.game_purchase_discount_countdown').text().trim();
         if (text) {
             countdownData.text = text;
         }
-    } catch { };
+    } catch { }
 
 
     try {
@@ -215,7 +215,7 @@ function getCountdownFromGameElement(gameElement) {
         if (time) {
             countdownData.time = time;
         }
-    } catch { };
+    } catch { }
 
     return countdownData;
 }
