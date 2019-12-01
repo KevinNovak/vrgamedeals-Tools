@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 8080;
 
 function main() {
     _app.use(_express.static('public'));
-    _app.use(_bodyParser.urlencoded({ extended: false }))
+    _app.use(_bodyParser.urlencoded({ extended: false }));
     _app.use(_bodyParser.json());
 
     _app.post('/api/app-scrape', async (req, res) => {
@@ -20,7 +20,7 @@ function main() {
             appPageHtml = await _httpClient.get(appUrl);
         } catch (error) {
             _logger.error(error);
-            res.status(500).json({ message: "Error retrieving page HTML." })
+            res.status(500).json({ message: "Error retrieving page HTML." });
             return;
         }
 
@@ -47,7 +47,7 @@ function main() {
             searchPageHtml = await _httpClient.get(searchUrl);
         } catch (error) {
             _logger.error(error);
-            res.status(500).json({ message: "Error retrieving page HTML." })
+            res.status(500).json({ message: "Error retrieving page HTML." });
             return;
         }
 
@@ -69,7 +69,7 @@ function main() {
             appPageHtml = await _httpClient.get(appUrl);
         } catch (error) {
             _logger.error(error);
-            res.status(500).json({ message: "Error retrieving page HTML." })
+            res.status(500).json({ message: "Error retrieving page HTML." });
             return;
         }
 
