@@ -36,21 +36,38 @@ let cache = {
     searchData: []
 };
 
+// Steam App Titler
+let steamAppBtn = document.getElementById("steam-app-btn");
+let steamAppUrlInput = document.getElementById("steam-app-url-input");
+let steamAppInfoSpan = document.getElementById("steam-app-info-span");
+let steamAppResultLink = document.getElementById("steam-app-result-link");
+
+// Steam Search Tabler
+let steamSearchBtn = document.getElementById("steam-search-btn");
+let steamSearchUrlInput = document.getElementById("steam-search-url-input");
+let steamSearchAllPagesInput = document.getElementById(
+    "steam-search-all-pages-input"
+);
+let steamSearchInfoSpan = document.getElementById("steam-search-info-span");
+let steamSearchResultTextArea = document.getElementById(
+    "steam-search-result-textarea"
+);
+let steamSearchDownloadLink = document.getElementById(
+    "steam-search-download-link"
+);
+
 async function retrieveSteamAppTitle() {
-    let retrievePageButton = document.getElementById(
-        "retrieve-steam-app-title"
-    );
-    let pageResultsDiv = document.getElementById("page-results");
+    steamAppBtn.disabled = true;
+    hideElement(steamAppResultLink);
+    setUnhideElement(steamAppInfoSpan, "Retrieving...");
 
-    retrievePageButton.disabled = true;
-    pageResultsDiv.innerHTML = "Retrieving...";
-
-    let steamAppUrlInput = document.getElementById("steam-app-url");
     let steamAppUrl = steamAppUrlInput.value.trim();
     if (!steamAppUrl || !STEAM_APP_URL_REGEX.test(steamAppUrl)) {
-        retrievePageButton.disabled = false;
-        pageResultsDiv.innerHTML =
-            "No results. Please input a valid Steam App URL.";
+        steamAppBtn.disabled = false;
+        setUnhideElement(
+            steamAppInfoSpan,
+            "No results. Please input a valid Steam App URL."
+        );
         return;
     }
 
@@ -72,47 +89,43 @@ async function retrieveSteamAppTitle() {
             : `(${appData.price})`;
         text += `${priceTag}`;
 
-        let link = document.createElement("a");
-        link.innerText = text;
-        link.href = steamAppUrl;
-        link.target = "_blank";
-        link.style.display = "inline";
-
-        pageResultsDiv.innerHTML = "";
-        pageResultsDiv.appendChild(link);
+        hideElement(steamAppInfoSpan);
+        steamAppResultLink.href = steamAppUrl;
+        setUnhideElement(steamAppResultLink, text);
     } catch (error) {
         console.error(error);
-        pageResultsDiv.innerHTML = "No results.";
+        setUnhideElement(steamAppInfoSpan, "No results.");
     }
 
-    retrievePageButton.disabled = false;
+    steamAppBtn.disabled = false;
 }
 
 async function retrieveSteamSearchTable() {
-    let searchResultsDiv = document.getElementById("search-results");
-    let retrieveSearchButton = document.getElementById(
-        "retrieve-steam-search-table"
-    );
+    steamSearchBtn.disabled = true;
+    hideElement(steamSearchResultTextArea);
+    hideElement(steamSearchDownloadLink);
+    setUnhideElement(steamSearchInfoSpan, "Retrieving...");
 
-    retrieveSearchButton.disabled = true;
-
-    let steamSearchUrlInput = document.getElementById("steam-search-url");
     let steamSearchUrl = steamSearchUrlInput.value.trim();
     if (!steamSearchUrl || !STEAM_SEARCH_URL_REGEX.test(steamSearchUrl)) {
-        retrieveSearchButton.disabled = false;
-        searchResultsDiv.innerHTML =
-            "No results. Please input a valid Steam Search URL.";
+        steamSearchBtn.disabled = false;
+        setUnhideElement(
+            steamSearchInfoSpan,
+            "No results. Please input a valid Steam Search URL."
+        );
         return;
     }
 
-    let searchAllPagesInput = document.getElementById("search-all-pages");
-    let searchAllPages = searchAllPagesInput.checked;
+    let searchAllPages = steamSearchAllPagesInput.checked;
 
     try {
         let searchData = [];
         if (searchAllPages) {
             for (let i = 1; i <= MAX_PAGES; i++) {
-                searchResultsDiv.innerHTML = `Retrieving page ${i}...`;
+                setUnhideElement(
+                    steamSearchInfoSpan,
+                    `Retrieving page ${i}...`
+                );
                 let searchPageData = await retrieveSearchPageData(
                     steamSearchUrl,
                     i
@@ -123,20 +136,23 @@ async function retrieveSteamSearchTable() {
                 searchData.push(...searchPageData);
             }
         } else {
-            searchResultsDiv.innerHTML = "Retrieving page...";
+            setUnhideElement(steamSearchInfoSpan, "Retrieving page...");
             let searchPageData = await retrieveSearchPageData(steamSearchUrl);
             searchData.push(...searchPageData);
         }
 
         if (!searchData || searchData.length < 1) {
-            retrieveSearchButton.disabled = false;
-            searchResultsDiv.innerHTML = "No results.";
+            steamSearchBtn.disabled = false;
+            setUnhideElement(steamSearchInfoSpan, "No results.");
             return;
         }
 
         for (let [index, app] of searchData.entries()) {
             let itemNumber = index + 1;
-            searchResultsDiv.innerHTML = `Retrieving result ${itemNumber} of ${searchData.length}...`;
+            setUnhideElement(
+                steamSearchInfoSpan,
+                `Retrieving result ${itemNumber} of ${searchData.length}...`
+            );
             if (app.type == "APP") {
                 let content = {
                     url: app.link
@@ -154,13 +170,10 @@ async function retrieveSteamSearchTable() {
             }
         }
 
-        let text = createMarkdownTable(searchData);
+        hideElement(steamSearchInfoSpan);
 
-        let textArea = document.createElement("textarea");
-        textArea.classList.add("form-control", "search-result");
-        textArea.wrap = "off";
-        textArea.readOnly = true;
-        textArea.innerHTML = text;
+        let text = createMarkdownTable(searchData);
+        setUnhideElement(steamSearchResultTextArea, text);
 
         let csvString = "\ufeff" + json2csv.parse(cache.searchData);
         let csvData = new Blob([csvString], {
@@ -169,21 +182,15 @@ async function retrieveSteamSearchTable() {
         });
         let csvUrl = URL.createObjectURL(csvData);
 
-        let downloadLink = document.createElement("a");
-        downloadLink.href = csvUrl;
-        downloadLink.target = "_blank";
-        downloadLink.innerHTML = "Download Raw Data as CSV";
-        downloadLink.download = `steam-data-${getFormattedTime()}.csv`;
-
-        searchResultsDiv.innerHTML = "";
-        searchResultsDiv.appendChild(textArea);
-        searchResultsDiv.appendChild(downloadLink);
+        steamSearchDownloadLink.href = csvUrl;
+        steamSearchDownloadLink.download = `steam-data-${getFormattedTime()}.csv`;
+        unhideElement(steamSearchDownloadLink);
     } catch (error) {
         console.error(error);
-        searchResultsDiv.innerHTML = "No results.";
+        setUnhideElement(steamSearchInfoSpan, "No results.");
     }
 
-    retrieveSearchButton.disabled = false;
+    steamSearchBtn.disabled = false;
 }
 
 function getFormattedTime() {
@@ -342,4 +349,17 @@ function getHeadsetAbbreviation(headsetName) {
     } else {
         return headsetName;
     }
+}
+
+function hideElement(element) {
+    element.classList.add("hidden");
+}
+
+function unhideElement(element) {
+    element.classList.remove("hidden");
+}
+
+function setUnhideElement(element, innerHtml) {
+    element.innerHTML = innerHtml;
+    element.classList.remove("hidden");
 }

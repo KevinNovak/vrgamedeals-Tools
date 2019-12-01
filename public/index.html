@@ -152,17 +152,19 @@
                             >
                             from a Steam app page.
                         </h5>
-                        <label for="steam-app-url"><b>Steam App URL</b></label>
+                        <label for="steam-app-url-input"
+                            ><b>Steam App URL</b></label
+                        >
                         <div class="input-group mb-3">
                             <input
-                                id="steam-app-url"
+                                id="steam-app-url-input"
                                 type="url"
                                 class="form-control"
                                 placeholder="https://store.steampowered.com/app/450390/The_Lab/"
                             />
                             <div class="input-group-append">
                                 <button
-                                    id="retrieve-steam-app-title"
+                                    id="steam-app-btn"
                                     class="btn btn-outline-secondary"
                                     type="button"
                                     onclick="retrieveSteamAppTitle()"
@@ -171,9 +173,15 @@
                                 </button>
                             </div>
                         </div>
-                        <div id="page-results">
-                            <span>No results.</span>
-                        </div>
+                        <span id="steam-app-info-span" class="hidden"
+                            >No results.</span
+                        >
+                        <a
+                            id="steam-app-result-link"
+                            href="#"
+                            target="_blank"
+                            class="hidden"
+                        ></a>
                     </div>
 
                     <hr />
@@ -208,23 +216,30 @@
                                 >Search: All VR Deals</a
                             >
                         </p>
-                        <label for="steam-search-url" class="mr-3"
+                        <label for="steam-search-url-input" class="mr-3"
                             ><b>Steam Search URL</b></label
                         >
-                        <input type="checkbox" value="" id="search-all-pages" />
-                        <label class="form-check-label" for="search-all-pages">
+                        <input
+                            type="checkbox"
+                            value=""
+                            id="steam-search-all-pages-input"
+                        />
+                        <label
+                            class="form-check-label"
+                            for="steam-search-all-pages-input"
+                        >
                             Search all pages
                         </label>
                         <div class="input-group mb-3">
                             <input
-                                id="steam-search-url"
+                                id="steam-search-url-input"
                                 type="url"
                                 class="form-control"
                                 placeholder="https://store.steampowered.com/search/?vrsupport=402&filter=weeklongdeals"
                             />
                             <div class="input-group-append">
                                 <button
-                                    id="retrieve-steam-search-table"
+                                    id="steam-search-btn"
                                     class="btn btn-outline-secondary"
                                     type="button"
                                     onclick="retrieveSteamSearchTable()"
@@ -233,9 +248,23 @@
                                 </button>
                             </div>
                         </div>
-                        <div id="search-results">
-                            <span>No results.</span>
-                        </div>
+
+                        <span id="steam-search-info-span" class="hidden"
+                            >No results.</span
+                        >
+                        <textarea
+                            id="steam-search-result-textarea"
+                            class="hidden form-control search-result"
+                            wrap="off"
+                            readonly
+                        ></textarea>
+                        <a
+                            id="steam-search-download-link"
+                            href="#"
+                            target="_blank"
+                            class="hidden"
+                            >Download Raw Data as CSV</a
+                        >
                     </div>
 
                     <hr />

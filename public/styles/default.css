@@ -11,6 +11,10 @@ textarea.search-result {
     min-height: 300px;
 }
 
+.hidden {
+    display: none;
+}
+
 .form-control::-webkit-input-placeholder {
     color: var(--placeholder-color);
     opacity: 1;

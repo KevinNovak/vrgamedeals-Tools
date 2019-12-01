@@ -27,7 +27,7 @@
         "request-promise": "4.2.4"
     },
     "devDependencies": {
-        "nodemon": "^1.19.4"
+        "nodemon": "^2.0.1"
     },
     "homepage": "https://github.com/KevinNovak/vrgamedeals-Tools#readme",
     "repository": {
