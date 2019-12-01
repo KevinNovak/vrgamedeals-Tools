@@ -2,6 +2,10 @@
     --placeholder-color: #ced4da;
 }
 
+.hidden {
+    display: none;
+}
+
 textarea.search-result {
     min-height: 300px;
 }

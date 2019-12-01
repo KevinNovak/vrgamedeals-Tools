@@ -171,9 +171,15 @@
                                 </button>
                             </div>
                         </div>
-                        <div id="page-results">
-                            <span>No results.</span>
-                        </div>
+                        <span id="steam-app-info" class="hidden"
+                            >No results.</span
+                        >
+                        <a
+                            id="steam-app-result"
+                            href="#"
+                            target="_blank"
+                            class="hidden"
+                        ></a>
                     </div>
 
                     <hr />
@@ -233,9 +239,23 @@
                                 </button>
                             </div>
                         </div>
-                        <div id="search-results">
-                            <span>No results.</span>
-                        </div>
+
+                        <span id="steam-search-info" class="hidden"
+                            >No results.</span
+                        >
+                        <textarea
+                            id="steam-search-result"
+                            class="hidden form-control search-result"
+                            wrap="off"
+                            readonly
+                        ></textarea>
+                        <a
+                            id="steam-search-download"
+                            href="#"
+                            target="_blank"
+                            class="hidden"
+                            >Download Raw Data as CSV</a
+                        >
                     </div>
 
                     <hr />
