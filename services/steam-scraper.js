@@ -104,7 +104,7 @@ function getHeadsets(appPageHtml) {
 function getReviews(appPageHtml) {
     let $ = _cheerio.load(appPageHtml);
 
-    let reviews = {
+    let reviewData = {
         reviewsPercent: "",
         reviewsCount: ""
     };
@@ -117,18 +117,10 @@ function getReviews(appPageHtml) {
 
     if (reviewsTooltip) {
         reviewsTooltip = reviewsTooltip.trim();
-        let reviewsPercent = _regexUtils.extractPercent(reviewsTooltip);
-        if (reviewsPercent) {
-            reviews.reviewsPercent = reviewsPercent;
-        }
-
-        let reviewsCount = _regexUtils.extractReviewsCount(reviewsTooltip);
-        if (reviewsCount) {
-            reviews.reviewsCount = reviewsCount;
-        }
+        reviewData = extractReviewDataFromTooltip(reviewsTooltip);
     }
 
-    return reviews;
+    return reviewData;
 }
 
 function getGameDataFromSearchResult(searchResult) {
@@ -197,19 +189,34 @@ function getGameDataFromSearchResult(searchResult) {
 
         if (reviewsTooltip) {
             reviewsTooltip = reviewsTooltip.trim();
-            let reviewsPercent = _regexUtils.extractPercent(reviewsTooltip);
-            if (reviewsPercent) {
-                gameData.reviewsPercent = reviewsPercent;
-            }
-
-            let reviewsCount = _regexUtils.extractReviewsCount(reviewsTooltip);
-            if (reviewsCount) {
-                gameData.reviewsCount = reviewsCount;
-            }
+            let reviewData = extractReviewDataFromTooltip(
+                reviewsTooltip,
+                gameData
+            );
+            gameData.reviewsPercent = reviewData.reviewsPercent;
+            gameData.reviewsCount = reviewData.reviewsCount;
         }
     }
 
     return gameData;
+}
+
+function extractReviewDataFromTooltip(reviewsTooltip) {
+    let reviewData = {
+        reviewsPercent: "",
+        reviewsCount: ""
+    };
+
+    let reviewsPercent = _regexUtils.extractPercent(reviewsTooltip);
+    if (reviewsPercent) {
+        reviewData.reviewsPercent = reviewsPercent;
+    }
+    let reviewsCount = _regexUtils.extractReviewsCount(reviewsTooltip);
+    if (reviewsCount) {
+        reviewData.reviewsCount = reviewsCount;
+    }
+
+    return reviewData;
 }
 
 function getGameDataFromGameElement(gameElement) {
