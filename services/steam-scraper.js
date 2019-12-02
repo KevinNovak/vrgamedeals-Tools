@@ -105,9 +105,28 @@ function getReviews(appPageHtml) {
     let $ = _cheerio.load(appPageHtml);
 
     let reviews = {
-        reviewsPercent: "65%",
-        reviewsCount: "20"
+        reviewsPercent: "",
+        reviewsCount: ""
     };
+
+    let reviewsTooltip = $(
+        "div.user_reviews_summary_bar span.game_review_summary"
+    )
+        .first()
+        .data("tooltip-html");
+
+    if (reviewsTooltip) {
+        reviewsTooltip = reviewsTooltip.trim();
+        let reviewsPercent = _regexUtils.extractPercent(reviewsTooltip);
+        if (reviewsPercent) {
+            reviews.reviewsPercent = reviewsPercent;
+        }
+
+        let reviewsCount = _regexUtils.extractReviewsCount(reviewsTooltip);
+        if (reviewsCount) {
+            reviews.reviewsCount = reviewsCount;
+        }
+    }
 
     return reviews;
 }
@@ -172,18 +191,18 @@ function getGameDataFromSearchResult(searchResult) {
     }
 
     if (gameData.type == "APP") {
-        let reviewsSummary = $(
+        let reviewsTooltip = $(
             "div.search_reviewscore > span.search_review_summary"
-        ).attr("data-tooltip-html");
+        ).data("tooltip-html");
 
-        if (reviewsSummary) {
-            reviewsSummary = reviewsSummary.trim();
-            let reviewsPercent = _regexUtils.extractPercent(reviewsSummary);
+        if (reviewsTooltip) {
+            reviewsTooltip = reviewsTooltip.trim();
+            let reviewsPercent = _regexUtils.extractPercent(reviewsTooltip);
             if (reviewsPercent) {
                 gameData.reviewsPercent = reviewsPercent;
             }
 
-            let reviewsCount = _regexUtils.extractReviewsCount(reviewsSummary);
+            let reviewsCount = _regexUtils.extractReviewsCount(reviewsTooltip);
             if (reviewsCount) {
                 gameData.reviewsCount = reviewsCount;
             }
