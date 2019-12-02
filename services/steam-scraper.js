@@ -17,9 +17,11 @@ function getAppPageData(appPageHtml) {
     let gameData = getGameDataFromGameElement(firstGame);
     let countdown = getCountdownFromGameElement(firstGame);
     let headsets = getHeadsets(appPageHtml);
+    let reviews = getReviews(appPageHtml);
 
     return {
         ...gameData,
+        ...reviews,
         countdown,
         headsets
     };
@@ -97,6 +99,17 @@ function getHeadsets(appPageHtml) {
     }
 
     return headsets;
+}
+
+function getReviews(appPageHtml) {
+    let $ = _cheerio.load(appPageHtml);
+
+    let reviews = {
+        reviewsPercent: "65%",
+        reviewsCount: "20"
+    };
+
+    return reviews;
 }
 
 function getGameDataFromSearchResult(searchResult) {
