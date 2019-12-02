@@ -41,6 +41,7 @@ let steamAppBtn = document.getElementById("steam-app-btn");
 let steamAppUrlInput = document.getElementById("steam-app-url-input");
 let steamAppInfoSpan = document.getElementById("steam-app-info-span");
 let steamAppResultLink = document.getElementById("steam-app-result-link");
+let steamAppRowPara = document.getElementById("steam-app-row-para");
 
 // Steam Search Tabler
 let steamSearchBtn = document.getElementById("steam-search-btn");
@@ -59,6 +60,7 @@ let steamSearchDownloadLink = document.getElementById(
 async function retrieveSteamAppTitle() {
     steamAppBtn.disabled = true;
     hideElement(steamAppResultLink);
+    hideElement(steamAppRowPara);
     setUnhideElement(steamAppInfoSpan, "Retrieving...");
 
     let steamAppUrl = steamAppUrlInput.value.trim();
@@ -90,8 +92,12 @@ async function retrieveSteamAppTitle() {
         text += `${priceTag}`;
 
         hideElement(steamAppInfoSpan);
+
         steamAppResultLink.href = steamAppUrl;
         setUnhideElement(steamAppResultLink, text);
+
+        let appRow = convertToRow(appData);
+        setUnhideElement(steamAppRowPara, appRow);
     } catch (error) {
         console.error(error);
         setUnhideElement(steamAppInfoSpan, "No results.");
@@ -267,17 +273,20 @@ function createMarkdownTable(searchData) {
 
     let formattedData = [];
 
-    for (let app of searchData) {
-        let formatted = formatAppData(app);
-        result +=
-            `| ${formatted.platformAbbreviated} | ${formatted.titleLink} | ${formatted.price} | ${formatted.percentOff} | ${formatted.reviews} | ${formatted.reviewsCount} |` +
-            NEW_LINE;
+    for (let appData of searchData) {
+        let formatted;
+        result += convertToRow(appData) + NEW_LINE;
         formattedData.push(formatted);
     }
 
     cache.searchData = formattedData;
 
     return result;
+}
+
+function convertToRow(appData) {
+    let formatted = formatAppData(appData);
+    return `| ${formatted.platformAbbreviated} | ${formatted.titleLink} | ${formatted.price} | ${formatted.percentOff} | ${formatted.reviews} | ${formatted.reviewsCount} |`;
 }
 
 async function post(url, content) {
