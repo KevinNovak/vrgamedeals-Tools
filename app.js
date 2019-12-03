@@ -26,6 +26,7 @@ function main() {
 
         try {
             let appPageData = _steamScraper.getAppPageData(appPageHtml);
+            appPageData.link = appUrl;
             res.status(200).json(appPageData);
             return;
         } catch (error) {

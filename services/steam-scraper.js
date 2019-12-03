@@ -17,9 +17,11 @@ function getAppPageData(appPageHtml) {
     let gameData = getGameDataFromGameElement(firstGame);
     let countdown = getCountdownFromGameElement(firstGame);
     let headsets = getHeadsets(appPageHtml);
+    let reviews = getReviews(appPageHtml);
 
     return {
         ...gameData,
+        ...reviews,
         countdown,
         headsets
     };
@@ -99,6 +101,28 @@ function getHeadsets(appPageHtml) {
     return headsets;
 }
 
+function getReviews(appPageHtml) {
+    let $ = _cheerio.load(appPageHtml);
+
+    let reviewData = {
+        reviewsPercent: "",
+        reviewsCount: ""
+    };
+
+    let reviewsTooltip = $(
+        "div.user_reviews_summary_bar span.game_review_summary"
+    )
+        .first()
+        .data("tooltip-html");
+
+    if (reviewsTooltip) {
+        reviewsTooltip = reviewsTooltip.trim();
+        reviewData = extractReviewDataFromTooltip(reviewsTooltip);
+    }
+
+    return reviewData;
+}
+
 function getGameDataFromSearchResult(searchResult) {
     let $ = _cheerio.load(searchResult);
 
@@ -159,25 +183,40 @@ function getGameDataFromSearchResult(searchResult) {
     }
 
     if (gameData.type == "APP") {
-        let reviewsSummary = $(
+        let reviewsTooltip = $(
             "div.search_reviewscore > span.search_review_summary"
-        ).attr("data-tooltip-html");
+        ).data("tooltip-html");
 
-        if (reviewsSummary) {
-            reviewsSummary = reviewsSummary.trim();
-            let reviewsPercent = _regexUtils.extractPercent(reviewsSummary);
-            if (reviewsPercent) {
-                gameData.reviewsPercent = reviewsPercent;
-            }
-
-            let reviewsCount = _regexUtils.extractReviewsCount(reviewsSummary);
-            if (reviewsCount) {
-                gameData.reviewsCount = reviewsCount;
-            }
+        if (reviewsTooltip) {
+            reviewsTooltip = reviewsTooltip.trim();
+            let reviewData = extractReviewDataFromTooltip(
+                reviewsTooltip,
+                gameData
+            );
+            gameData.reviewsPercent = reviewData.reviewsPercent;
+            gameData.reviewsCount = reviewData.reviewsCount;
         }
     }
 
     return gameData;
+}
+
+function extractReviewDataFromTooltip(reviewsTooltip) {
+    let reviewData = {
+        reviewsPercent: "",
+        reviewsCount: ""
+    };
+
+    let reviewsPercent = _regexUtils.extractPercent(reviewsTooltip);
+    if (reviewsPercent) {
+        reviewData.reviewsPercent = reviewsPercent;
+    }
+    let reviewsCount = _regexUtils.extractReviewsCount(reviewsTooltip);
+    if (reviewsCount) {
+        reviewData.reviewsCount = reviewsCount;
+    }
+
+    return reviewData;
 }
 
 function getGameDataFromGameElement(gameElement) {

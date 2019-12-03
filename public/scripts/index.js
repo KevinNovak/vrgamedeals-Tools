@@ -32,15 +32,13 @@ const HEADSET_ALIASES = {
     }
 };
 
-let cache = {
-    searchData: []
-};
-
 // Steam App Titler
 let steamAppBtn = document.getElementById("steam-app-btn");
 let steamAppUrlInput = document.getElementById("steam-app-url-input");
 let steamAppInfoSpan = document.getElementById("steam-app-info-span");
+let steamAppResultsDiv = document.getElementById("steam-app-results");
 let steamAppResultLink = document.getElementById("steam-app-result-link");
+let steamAppRowPara = document.getElementById("steam-app-row-para");
 
 // Steam Search Tabler
 let steamSearchBtn = document.getElementById("steam-search-btn");
@@ -49,6 +47,7 @@ let steamSearchAllPagesInput = document.getElementById(
     "steam-search-all-pages-input"
 );
 let steamSearchInfoSpan = document.getElementById("steam-search-info-span");
+let steamSearchResultsDiv = document.getElementById("steam-search-results");
 let steamSearchResultTextArea = document.getElementById(
     "steam-search-result-textarea"
 );
@@ -58,7 +57,7 @@ let steamSearchDownloadLink = document.getElementById(
 
 async function retrieveSteamAppTitle() {
     steamAppBtn.disabled = true;
-    hideElement(steamAppResultLink);
+    hideElement(steamAppResultsDiv);
     setUnhideElement(steamAppInfoSpan, "Retrieving...");
 
     let steamAppUrl = steamAppUrlInput.value.trim();
@@ -90,10 +89,17 @@ async function retrieveSteamAppTitle() {
         text += `${priceTag}`;
 
         hideElement(steamAppInfoSpan);
+
         steamAppResultLink.href = steamAppUrl;
-        setUnhideElement(steamAppResultLink, text);
+        steamAppResultLink.innerHTML = text;
+
+        let app = formatAppData(appData);
+        let appRow = convertToRow(app);
+        steamAppRowPara.innerHTML = appRow;
+        unhideElement(steamAppResultsDiv);
     } catch (error) {
         console.error(error);
+        hideElement(steamAppResultsDiv);
         setUnhideElement(steamAppInfoSpan, "No results.");
     }
 
@@ -102,8 +108,7 @@ async function retrieveSteamAppTitle() {
 
 async function retrieveSteamSearchTable() {
     steamSearchBtn.disabled = true;
-    hideElement(steamSearchResultTextArea);
-    hideElement(steamSearchDownloadLink);
+    hideElement(steamSearchResultsDiv);
     setUnhideElement(steamSearchInfoSpan, "Retrieving...");
 
     let steamSearchUrl = steamSearchUrlInput.value.trim();
@@ -172,10 +177,12 @@ async function retrieveSteamSearchTable() {
 
         hideElement(steamSearchInfoSpan);
 
-        let text = createMarkdownTable(searchData);
-        setUnhideElement(steamSearchResultTextArea, text);
+        let formattedSearchData = searchData.map(formatAppData);
 
-        let csvString = "\ufeff" + json2csv.parse(cache.searchData);
+        let text = createMarkdownTable(formattedSearchData);
+        steamSearchResultTextArea.innerHTML = text;
+
+        let csvString = "\ufeff" + json2csv.parse(formattedSearchData);
         let csvData = new Blob([csvString], {
             encoding: "UTF-8",
             type: "text/csv;charset=UTF-8"
@@ -184,9 +191,11 @@ async function retrieveSteamSearchTable() {
 
         steamSearchDownloadLink.href = csvUrl;
         steamSearchDownloadLink.download = `steam-data-${getFormattedTime()}.csv`;
-        unhideElement(steamSearchDownloadLink);
+
+        unhideElement(steamSearchResultsDiv);
     } catch (error) {
         console.error(error);
+        hideElement(steamSearchResultsDiv);
         setUnhideElement(steamSearchInfoSpan, "No results.");
     }
 
@@ -259,25 +268,21 @@ async function retrieveSearchPageData(steamSearchUrl, pageNumber) {
     return await post("./api/search-scrape", content);
 }
 
-function createMarkdownTable(searchData) {
+function createMarkdownTable(formattedSearchData) {
     let header =
         "| Platform | Title | Price (USD) | Discount (%) | Rating (%) | Review Count |";
     let divider = "| :- | :- | -: | -: | -: | -: |";
     let result = header + NEW_LINE + divider + NEW_LINE;
 
-    let formattedData = [];
-
-    for (let app of searchData) {
-        let formatted = formatAppData(app);
-        result +=
-            `| ${formatted.platformAbbreviated} | ${formatted.titleLink} | ${formatted.price} | ${formatted.percentOff} | ${formatted.reviews} | ${formatted.reviewsCount} |` +
-            NEW_LINE;
-        formattedData.push(formatted);
+    for (let app of formattedSearchData) {
+        result += convertToRow(app) + NEW_LINE;
     }
 
-    cache.searchData = formattedData;
-
     return result;
+}
+
+function convertToRow(app) {
+    return `| ${app.platformAbbreviated} | ${app.titleLink} | ${app.price} | ${app.percentOff} | ${app.reviews} | ${app.reviewsCount} |`;
 }
 
 async function post(url, content) {
