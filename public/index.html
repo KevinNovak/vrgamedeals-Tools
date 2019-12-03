@@ -142,15 +142,9 @@
                     <hr />
 
                     <div class="module">
-                        <h3>Steam App Titler</h3>
+                        <h3>Steam App Scraper</h3>
                         <h5>
-                            Creates a title for a
-                            <a
-                                href="https://www.reddit.com/r/vrgamedeals/submit"
-                                target="_blank"
-                                >r/vrgamedeals link post</a
-                            >
-                            from a Steam app page.
+                            Extracts data from a Steam app page.
                         </h5>
                         <label for="steam-app-url-input"
                             ><b>Steam App URL</b></label
@@ -177,11 +171,19 @@
                             >No results.</span
                         >
                         <div id="steam-app-results" class="hidden">
-                            <a
-                                id="steam-app-result-link"
-                                href="#"
-                                target="_blank"
-                                >Link</a
+                            <label for="steam-app-result-link"
+                                ><b>Post Title</b></label
+                            >
+                            <p>
+                                <a
+                                    id="steam-app-result-link"
+                                    href="#"
+                                    target="_blank"
+                                    >Link</a
+                                >
+                            </p>
+                            <label for="steam-app-row-para"
+                                ><b>Table Row</b></label
                             >
                             <p id="steam-app-row-para">Row</p>
                         </div>
@@ -190,15 +192,9 @@
                     <hr />
 
                     <div class="module">
-                        <h3>Steam Search Tabler</h3>
+                        <h3>Steam Search Scraper</h3>
                         <h5>
-                            Creates a table for a
-                            <a
-                                href="https://www.reddit.com/r/vrgamedeals/submit?selftext=true"
-                                target="_blank"
-                                >r/vrgamedeals text post</a
-                            >
-                            from a Steam search.
+                            Extracts data from a Steam search.
                         </h5>
                         <p>
                             <a
@@ -255,6 +251,9 @@
                             >No results.</span
                         >
                         <div id="steam-search-results" class="hidden">
+                            <label for="steam-search-result-textarea"
+                                ><b>Markdown Table</b></label
+                            >
                             <textarea
                                 id="steam-search-result-textarea"
                                 class="form-control search-result"
