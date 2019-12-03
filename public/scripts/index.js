@@ -38,7 +38,7 @@ let steamAppUrlInput = document.getElementById("steam-app-url-input");
 let steamAppInfoSpan = document.getElementById("steam-app-info-span");
 let steamAppResultsDiv = document.getElementById("steam-app-results");
 let steamAppResultLink = document.getElementById("steam-app-result-link");
-let steamAppRowPara = document.getElementById("steam-app-row-para");
+let steamAppRowTextArea = document.getElementById("steam-app-row-textarea");
 
 // Steam Search Tabler
 let steamSearchBtn = document.getElementById("steam-search-btn");
@@ -95,7 +95,7 @@ async function retrieveSteamAppTitle() {
 
         let app = formatAppData(appData);
         let appRow = convertToRow(app);
-        steamAppRowPara.innerHTML = appRow;
+        steamAppRowTextArea.innerHTML = appRow;
         unhideElement(steamAppResultsDiv);
     } catch (error) {
         console.error(error);
