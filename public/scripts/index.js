@@ -32,10 +32,6 @@ const HEADSET_ALIASES = {
     }
 };
 
-let cache = {
-    searchData: []
-};
-
 // Steam App Titler
 let steamAppBtn = document.getElementById("steam-app-btn");
 let steamAppUrlInput = document.getElementById("steam-app-url-input");
