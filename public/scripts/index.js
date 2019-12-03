@@ -178,10 +178,12 @@ async function retrieveSteamSearchTable() {
 
         hideElement(steamSearchInfoSpan);
 
-        let text = createMarkdownTable(searchData);
+        let formattedSearchData = searchData.map(formatAppData);
+
+        let text = createMarkdownTable(formattedSearchData);
         setUnhideElement(steamSearchResultTextArea, text);
 
-        let csvString = "\ufeff" + json2csv.parse(cache.searchData);
+        let csvString = "\ufeff" + json2csv.parse(formattedSearchData);
         let csvData = new Blob([csvString], {
             encoding: "UTF-8",
             type: "text/csv;charset=UTF-8"
@@ -265,28 +267,21 @@ async function retrieveSearchPageData(steamSearchUrl, pageNumber) {
     return await post("./api/search-scrape", content);
 }
 
-function createMarkdownTable(searchData) {
+function createMarkdownTable(formattedSearchData) {
     let header =
         "| Platform | Title | Price (USD) | Discount (%) | Rating (%) | Review Count |";
     let divider = "| :- | :- | -: | -: | -: | -: |";
     let result = header + NEW_LINE + divider + NEW_LINE;
 
-    let formattedData = [];
-
-    for (let appData of searchData) {
-        let formatted;
-        result += convertToRow(appData) + NEW_LINE;
-        formattedData.push(formatted);
+    for (let app of formattedSearchData) {
+        result += convertToRow(app) + NEW_LINE;
     }
-
-    cache.searchData = formattedData;
 
     return result;
 }
 
-function convertToRow(appData) {
-    let formatted = formatAppData(appData);
-    return `| ${formatted.platformAbbreviated} | ${formatted.titleLink} | ${formatted.price} | ${formatted.percentOff} | ${formatted.reviews} | ${formatted.reviewsCount} |`;
+function convertToRow(app) {
+    return `| ${app.platformAbbreviated} | ${app.titleLink} | ${app.price} | ${app.percentOff} | ${app.reviews} | ${app.reviewsCount} |`;
 }
 
 async function post(url, content) {
