@@ -92,7 +92,8 @@ async function retrieveSteamAppTitle() {
         steamAppResultLink.href = steamAppUrl;
         setUnhideElement(steamAppResultLink, text);
 
-        let appRow = convertToRow(appData);
+        let app = formatAppData(appData);
+        let appRow = convertToRow(app);
         setUnhideElement(steamAppRowPara, appRow);
     } catch (error) {
         console.error(error);
