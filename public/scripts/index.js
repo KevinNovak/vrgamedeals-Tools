@@ -36,6 +36,7 @@ const HEADSET_ALIASES = {
 let steamAppBtn = document.getElementById("steam-app-btn");
 let steamAppUrlInput = document.getElementById("steam-app-url-input");
 let steamAppInfoSpan = document.getElementById("steam-app-info-span");
+let steamAppResultsDiv = document.getElementById("steam-app-results");
 let steamAppResultLink = document.getElementById("steam-app-result-link");
 let steamAppRowPara = document.getElementById("steam-app-row-para");
 
@@ -46,6 +47,7 @@ let steamSearchAllPagesInput = document.getElementById(
     "steam-search-all-pages-input"
 );
 let steamSearchInfoSpan = document.getElementById("steam-search-info-span");
+let steamSearchResultsDiv = document.getElementById("steam-search-results");
 let steamSearchResultTextArea = document.getElementById(
     "steam-search-result-textarea"
 );
@@ -55,8 +57,7 @@ let steamSearchDownloadLink = document.getElementById(
 
 async function retrieveSteamAppTitle() {
     steamAppBtn.disabled = true;
-    hideElement(steamAppResultLink);
-    hideElement(steamAppRowPara);
+    hideElement(steamAppResultsDiv);
     setUnhideElement(steamAppInfoSpan, "Retrieving...");
 
     let steamAppUrl = steamAppUrlInput.value.trim();
@@ -90,13 +91,15 @@ async function retrieveSteamAppTitle() {
         hideElement(steamAppInfoSpan);
 
         steamAppResultLink.href = steamAppUrl;
-        setUnhideElement(steamAppResultLink, text);
+        steamAppResultLink.innerHTML = text;
 
         let app = formatAppData(appData);
         let appRow = convertToRow(app);
-        setUnhideElement(steamAppRowPara, appRow);
+        steamAppRowPara.innerHTML = appRow;
+        unhideElement(steamAppResultsDiv);
     } catch (error) {
         console.error(error);
+        hideElement(steamAppResultsDiv);
         setUnhideElement(steamAppInfoSpan, "No results.");
     }
 
@@ -105,8 +108,7 @@ async function retrieveSteamAppTitle() {
 
 async function retrieveSteamSearchTable() {
     steamSearchBtn.disabled = true;
-    hideElement(steamSearchResultTextArea);
-    hideElement(steamSearchDownloadLink);
+    hideElement(steamSearchResultsDiv);
     setUnhideElement(steamSearchInfoSpan, "Retrieving...");
 
     let steamSearchUrl = steamSearchUrlInput.value.trim();
@@ -178,7 +180,7 @@ async function retrieveSteamSearchTable() {
         let formattedSearchData = searchData.map(formatAppData);
 
         let text = createMarkdownTable(formattedSearchData);
-        setUnhideElement(steamSearchResultTextArea, text);
+        steamSearchResultTextArea.innerHTML = text;
 
         let csvString = "\ufeff" + json2csv.parse(formattedSearchData);
         let csvData = new Blob([csvString], {
@@ -189,9 +191,11 @@ async function retrieveSteamSearchTable() {
 
         steamSearchDownloadLink.href = csvUrl;
         steamSearchDownloadLink.download = `steam-data-${getFormattedTime()}.csv`;
-        unhideElement(steamSearchDownloadLink);
+
+        unhideElement(steamSearchResultsDiv);
     } catch (error) {
         console.error(error);
+        hideElement(steamSearchResultsDiv);
         setUnhideElement(steamSearchInfoSpan, "No results.");
     }
 

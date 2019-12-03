@@ -176,13 +176,15 @@
                         <span id="steam-app-info-span" class="hidden"
                             >No results.</span
                         >
-                        <a
-                            id="steam-app-result-link"
-                            href="#"
-                            target="_blank"
-                            class="hidden"
-                        >Link</a>
-                        <p id="steam-app-row-para" class="hidden">Row</p>
+                        <div id="steam-app-results" class="hidden">
+                            <a
+                                id="steam-app-result-link"
+                                href="#"
+                                target="_blank"
+                                >Link</a
+                            >
+                            <p id="steam-app-row-para">Row</p>
+                        </div>
                     </div>
 
                     <hr />
@@ -249,23 +251,23 @@
                                 </button>
                             </div>
                         </div>
-
                         <span id="steam-search-info-span" class="hidden"
                             >No results.</span
                         >
-                        <textarea
-                            id="steam-search-result-textarea"
-                            class="hidden form-control search-result"
-                            wrap="off"
-                            readonly
-                        ></textarea>
-                        <a
-                            id="steam-search-download-link"
-                            href="#"
-                            target="_blank"
-                            class="hidden"
-                            >Download Raw Data as CSV</a
-                        >
+                        <div id="steam-search-results" class="hidden">
+                            <textarea
+                                id="steam-search-result-textarea"
+                                class="form-control search-result"
+                                wrap="off"
+                                readonly
+                            ></textarea>
+                            <a
+                                id="steam-search-download-link"
+                                href="#"
+                                target="_blank"
+                                >Download Raw Data as CSV</a
+                            >
+                        </div>
                     </div>
 
                     <hr />
