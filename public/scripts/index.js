@@ -55,6 +55,21 @@ let steamSearchDownloadLink = document.getElementById(
     "steam-search-download-link"
 );
 
+// Register events
+steamAppUrlInput.addEventListener("keyup", event => {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        steamAppBtn.click();
+    }
+});
+
+steamSearchUrlInput.addEventListener("keyup", event => {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        steamSearchBtn.click();
+    }
+});
+
 async function retrieveSteamAppTitle() {
     steamAppBtn.disabled = true;
     hideElement(steamAppResultsDiv);
