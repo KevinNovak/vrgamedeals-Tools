@@ -16,6 +16,7 @@ function getAppPageData(appPageHtml) {
 
     let gameData = getGameDataFromGameElement(firstGame);
     let countdown = getCountdownFromGameElement(firstGame);
+    let vrSupport = getVrSupportFromGameElement(firstGame);
     let headsets = getHeadsets(appPageHtml);
     let reviews = getReviews(appPageHtml);
 
@@ -23,6 +24,7 @@ function getAppPageData(appPageHtml) {
         ...gameData,
         ...reviews,
         countdown,
+        vrSupport,
         headsets
     };
 }
@@ -54,10 +56,12 @@ function getSearchAppPageData(appPageHtml) {
     }
 
     let countdown = getCountdownFromGameElement(firstGame);
+    let vrSupport = getVrSupportFromGameElement(firstGame);
     let headsets = getHeadsets(appPageHtml);
 
     return {
         countdown,
+        vrSupport,
         headsets
     };
 }
@@ -305,6 +309,20 @@ function getCountdownFromGameElement(gameElement) {
     } catch {}
 
     return countdownData;
+}
+
+function getVrSupportFromGameElement(gameElement) {
+    let $ = _cheerio.load(gameElement);
+
+    let vrSupport = "NONE";
+
+    if ($(".vr_required").length > 0) {
+        vrSupport = "REQUIRED";
+    } else if ($(".vr_supported").length > 0) {
+        vrSupport = "SUPPORTED";
+    }
+
+    return vrSupport;
 }
 
 module.exports = {

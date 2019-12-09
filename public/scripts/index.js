@@ -181,12 +181,14 @@ async function retrieveSteamSearchTable() {
                 let appData = await post("./api/search-app-scrape", content);
                 app.headsets = appData.headsets || [];
                 app.countdown = appData.countdown || { text: "", time: 0 };
+                app.vrSupport = appData.vrSupport || "";
             } else {
                 app.headsets = [];
                 app.countdown = {
                     text: "",
                     time: 0
                 };
+                app.vrSupport = "";
             }
         }
 
@@ -232,6 +234,7 @@ function getFormattedTime() {
 function formatAppData(app) {
     let formattedData = {
         type: "",
+        vrSupport: "",
         platform: "",
         platformAbbreviated: "",
         title: "",
@@ -247,6 +250,7 @@ function formatAppData(app) {
     };
 
     formattedData.type = app.type;
+    formattedData.vrSupport = app.vrSupport;
     formattedData.platform = app.headsets.join(", ");
     formattedData.platformAbbreviated = app.headsets
         .map(platform => getHeadsetAbbreviation(platform))
