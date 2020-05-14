@@ -99,7 +99,7 @@ async function retrieveSteamAppTitle() {
         }
         text += `${appData.title} `;
         let priceTag = appData.percentOff
-            ? `(${appData.price} / ${appData.percentOff} off)`
+            ? `(${appData.price} / -${appData.percentOff})`
             : `(${appData.price})`;
         text += `${priceTag}`;
 
