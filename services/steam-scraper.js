@@ -88,13 +88,11 @@ function getTitle(appPageHtml) {
 
     let gameDetailsElement = $(
         '.game_details .details_block:contains("Title:")'
-    )
-        .first()
-        ?.html()
-        .trim();
+    ).first();
 
     if (gameDetailsElement) {
-        title = _regexUtils.extractTitle(gameDetailsElement);
+        let gameDetailsContent = gameDetailsElement.html().trim();
+        title = _regexUtils.extractTitle(gameDetailsContent);
     }
 
     return title;
