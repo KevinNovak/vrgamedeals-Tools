@@ -1,14 +1,17 @@
 const _express = require('express');
 const _app = _express();
 const _bodyParser = require('body-parser');
+const _puppeteer = require('puppeteer');
+
 const _httpClient = require('./services/http-client');
 const _steamScraper = require('./services/steam-scraper');
 const _oculusScraper = require('./services/oculus-scraper');
 const _logger = require('./services/logger');
 
 const PORT = process.env.PORT || 8080;
+let browser;
 
-function main() {
+async function main() {
     _app.use(_express.static('public'));
     _app.use(_bodyParser.urlencoded({ extended: false }));
     _app.use(_bodyParser.json());
@@ -94,26 +97,16 @@ function main() {
     _app.post('/api/oculus/experience-scrape', async (req, res) => {
         let experienceUrl = req.body.url;
 
-        let experiencePageHtml;
         try {
-            experiencePageHtml = await _httpClient.get(experienceUrl);
-        } catch (error) {
-            _logger.error(error);
-            res.status(500).json({ message: 'Error retrieving page HTML.' });
-            return;
-        }
-
-        try {
-            let experiencePageData = _oculusScraper.getExperiencePageData(experiencePageHtml);
-            experiencePageData.link = experienceUrl;
-            res.status(200).json(experiencePageData);
-            return;
+            let experiencePageData = await _oculusScraper.scrapePage(browser, experienceUrl, res);
         } catch (error) {
             _logger.error(error);
             res.status(500).json({ message: 'Error scraping page data.' });
             return;
         }
     });
+
+    browser = await _puppeteer.launch();
 
     _app.listen(PORT, () => {
         _logger.info(`App listening on port ${PORT}!`);
