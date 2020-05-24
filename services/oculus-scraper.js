@@ -1,42 +1,55 @@
-async function scrapePage(browser, url, res) {
+const _pt = require('promise-timeout');
+
+async function scrapePage(browser, url) {
     const page = await browser.newPage();
 
-    listener = page.on('response', async response => {
-        let request = response.request();
-        // Check request type is XHR
-        if (!isXhr(request)) {
-            return;
-        }
+    let getJson = new Promise(async (resolve, reject) => {
+        page.on('response', async response => {
+            let request = response.request();
+            // Check request type is XHR
+            if (!isXhr(request)) {
+                return;
+            }
 
-        // Check URL starts with what we want
-        let requestUrl = request.url();
-        if (!requestUrl.startsWith('https://graph.oculus.com/graphql')) {
-            return;
-        }
+            // Check URL starts with what we want
+            let requestUrl = request.url();
+            if (!requestUrl.startsWith('https://graph.oculus.com/graphql')) {
+                return;
+            }
 
-        // Check response is JSON
-        let responseJson = await toJson(response);
-        if (!responseJson) {
-            return;
-        }
+            // Check response is JSON
+            let responseJson = await toJson(response);
+            if (!responseJson) {
+                return;
+            }
 
-        // Check property exists
-        let node = responseJson.data?.node;
-        if (!node) {
-            return;
-        }
+            // Check property exists
+            let node = responseJson.data?.node;
+            if (!node) {
+                return;
+            }
 
-        // Check property type is what we expect
-        let nodeType = node.__typename;
-        if (!nodeType?.toLowerCase() == 'application') {
-            return;
-        }
+            // Check property type is what we expect
+            let nodeType = node.__typename;
+            if (!nodeType?.toLowerCase() == 'application') {
+                return;
+            }
 
-        res.status(200).json(node);
-        await page.close();
+            // Close the page and return result
+            await page.close();
+            resolve(node);
+        });
     });
 
-    await page.goto(url);
+    await page.goto(url).catch(async error => {
+        await page.close();
+        throw error;
+    });
+
+    return _pt.timeout(getJson, 20 * 1000).catch(async error => {
+        await page.close();
+        throw error;
+    });
 }
 
 function isXhr(request) {

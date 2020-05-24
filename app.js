@@ -96,9 +96,10 @@ async function main() {
 
     _app.post('/api/oculus/experience-scrape', async (req, res) => {
         let experienceUrl = req.body.url;
-
         try {
-            let experiencePageData = await _oculusScraper.scrapePage(browser, experienceUrl, res);
+            let experiencePageData = await _oculusScraper.scrapePage(browser, experienceUrl);
+            res.status(200).json(experiencePageData);
+            return;
         } catch (error) {
             _logger.error(error);
             res.status(500).json({ message: 'Error scraping page data.' });
@@ -106,7 +107,7 @@ async function main() {
         }
     });
 
-    browser = await _puppeteer.launch({ args: ['--no-sandbox'] });
+    browser = await _puppeteer.launch({ args: ['--no-sandbox'], headless: false });
 
     _app.listen(PORT, () => {
         _logger.info(`App listening on port ${PORT}!`);
