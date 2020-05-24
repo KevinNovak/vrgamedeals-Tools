@@ -245,10 +245,10 @@ async function retrieveOculusExperienceTitle() {
         //     text += `[${platforms}] `;
         // }
         text += `${appData.display_name} `;
-        // let priceTag = appData.percentOff
-        //     ? `(${appData.price} / -${appData.percentOff})`
-        //     : `(${appData.price})`;
-        // text += `${priceTag}`;
+        let priceTag = appData.current_offer.promo_benefit
+            ? `(${appData.current_offer.price.formatted} / ${appData.current_offer.promo_benefit})`
+            : `(${appData.current_offer.price.formatted})`;
+        text += `${priceTag}`;
 
         hideElement(oculusExperienceInfoSpan);
 
