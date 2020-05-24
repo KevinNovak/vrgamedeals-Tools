@@ -107,7 +107,7 @@ async function main() {
         }
     });
 
-    browser = await _puppeteer.launch({ args: ['--no-sandbox'], headless: false });
+    browser = await _puppeteer.launch({ args: ['--no-sandbox'], headless: true });
 
     _app.listen(PORT, () => {
         _logger.info(`App listening on port ${PORT}!`);
