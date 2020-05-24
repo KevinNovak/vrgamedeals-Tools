@@ -1,6 +1,7 @@
 const STEAM_APP_URL_REGEX = /^https:\/\/store.steampowered.com\/app\/\d+/;
 const STEAM_SEARCH_URL_REGEX = /^https:\/\/store.steampowered.com\/search\/\S*/;
-const OCULUS_EXPERIENCE_URL_REGEX = /^https:\/\/www.oculus.com\/experiences\/rift\/\d+/;
+const OCULUS_EXPERIENCE_RIFT_URL_REGEX = /^https:\/\/www.oculus.com\/experiences\/rift\/\d+/;
+const OCULUS_EXPERIENCE_QUEST_URL_REGEX = /^https:\/\/www.oculus.com\/experiences\/quest\/\d+/;
 
 const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
 const PERCENT_NUMBER_REGEX = /(\d+)%/;
@@ -223,7 +224,10 @@ async function retrieveOculusExperienceTitle() {
     setUnhideElement(oculusExperienceInfoSpan, 'Retrieving...');
 
     let oculusExperienceUrl = oculusExperienceUrlInput.value.trim();
-    if (!oculusExperienceUrl || !OCULUS_EXPERIENCE_URL_REGEX.test(oculusExperienceUrl)) {
+    let isRift = OCULUS_EXPERIENCE_RIFT_URL_REGEX.test(oculusExperienceUrl);
+    let isQuest = OCULUS_EXPERIENCE_QUEST_URL_REGEX.test(oculusExperienceUrl);
+
+    if (!oculusExperienceUrl || !(isRift || isQuest)) {
         oculusExperienceBtn.disabled = false;
         setUnhideElement(
             oculusExperienceInfoSpan,
@@ -240,10 +244,13 @@ async function retrieveOculusExperienceTitle() {
         let appData = await post('./api/oculus/experience-scrape', content);
 
         let text = '';
-        // if (appData.headsets.length > 0) {
-        //     let platforms = getPlatformText(appData.headsets);
-        //     text += `[${platforms}] `;
-        // }
+        let platform = 'Unknown';
+        if (isRift) {
+            platform = 'Rift';
+        } else if (isQuest) {
+            platform = 'Quest';
+        }
+        text += `[${platform}] `;
         text += `${appData.display_name} `;
         let priceTag = appData.current_offer.promo_benefit
             ? `(${appData.current_offer.price.formatted} / ${appData.current_offer.promo_benefit})`
