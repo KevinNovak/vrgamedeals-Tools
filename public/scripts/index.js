@@ -33,6 +33,18 @@ const HEADSET_ALIASES = {
         shortName: 'WMR',
         abbreviation: 'W',
     },
+    RIFT: {
+        shortName: 'Rift',
+        abbreviation: 'R',
+    },
+    LAGUNA: {
+        shortName: 'Rift',
+        abbreviation: 'R',
+    },
+    MONTEREY: {
+        shortName: 'Quest',
+        abbreviation: 'Q',
+    },
 };
 
 // Steam App Titler
@@ -244,13 +256,13 @@ async function retrieveOculusExperienceTitle() {
         let appData = await post('./api/oculus/experience-scrape', content);
 
         let text = '';
-        let platform = 'Unknown';
-        if (isRift) {
-            platform = 'Rift';
-        } else if (isQuest) {
-            platform = 'Quest';
+        let supportedHeadsets = appData.supported_hmd_platforms;
+        if (supportedHeadsets.includes('RIFT') && supportedHeadsets.includes('LAGUNA')) {
+            supportedHeadsets = supportedHeadsets.filter(headset => headset != 'RIFT');
         }
-        text += `[${platform}] `;
+
+        let platforms = getPlatformText(supportedHeadsets);
+        text += `[${platforms}] `;
         text += `${appData.display_name} `;
         let priceTag = appData.current_offer.promo_benefit
             ? `(${appData.current_offer.price.formatted} / ${appData.current_offer.promo_benefit})`
