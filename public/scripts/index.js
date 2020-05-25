@@ -1,6 +1,6 @@
 const STEAM_APP_URL_REGEX = /^https:\/\/store.steampowered.com\/app\/\d+/;
 const STEAM_SEARCH_URL_REGEX = /^https:\/\/store.steampowered.com\/search\/\S*/;
-const OCULUS_EXPERIENCE_URL_REGEX = /^https:\/\/www.oculus.com\/experiences\/(rift|quest|go|gear-vr)\/\d+/;
+const OCULUS_EXPERIENCE_URL_REGEX = /^https:\/\/www.oculus.com\/experiences\/(rift|quest|go)\/\d+/;
 
 const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
 const PERCENT_NUMBER_REGEX = /(\d+)%/;
@@ -44,13 +44,9 @@ const HEADSET_ALIASES = {
         shortName: 'Quest',
         abbreviation: 'Q',
     },
-    GEARVR: {
-        shortName: 'Gear VR',
-        abbreviation: 'Gear',
-    },
     PACIFIC: {
         shortName: 'Go',
-        abbreviation: 'Go',
+        abbreviation: 'G',
     },
 };
 
@@ -262,8 +258,15 @@ async function retrieveOculusExperienceTitle() {
 
         let text = '';
         let supportedHeadsets = appData.supported_hmd_platforms;
+
+        // Combine Rift and Rift S
         if (supportedHeadsets.includes('RIFT') && supportedHeadsets.includes('LAGUNA')) {
             supportedHeadsets = supportedHeadsets.filter(headset => headset != 'RIFT');
+        }
+
+        // Remove Gear VR
+        if (supportedHeadsets.includes('GEARVR')) {
+            supportedHeadsets = supportedHeadsets.filter(headset => headset != 'GEARVR');
         }
 
         let platforms = getPlatformText(supportedHeadsets);
