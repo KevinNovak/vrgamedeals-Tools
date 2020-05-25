@@ -2,6 +2,10 @@ const _pt = require('promise-timeout');
 
 async function scrapePage(browser, url) {
     const page = await browser.newPage();
+    await page.goto(url).catch(async error => {
+        await page.close();
+        throw error;
+    });
 
     let getJson = new Promise(async (resolve, reject) => {
         page.on('response', async response => {
@@ -13,6 +17,7 @@ async function scrapePage(browser, url) {
 
             // Check URL starts with what we want
             let requestUrl = request.url();
+            console.log(requestUrl);
             if (!requestUrl.startsWith('https://graph.oculus.com/graphql')) {
                 return;
             }
@@ -36,20 +41,16 @@ async function scrapePage(browser, url) {
             }
 
             // Close the page and return result
-            await page.close();
             resolve(node);
         });
     });
 
-    await page.goto(url).catch(async error => {
-        await page.close();
-        throw error;
-    });
-
-    return _pt.timeout(getJson, 20 * 1000).catch(async error => {
-        await page.close();
-        throw error;
-    });
+    return await _pt
+        .timeout(getJson, 5 * 1000)
+        .catch(async error => {
+            throw error;
+        })
+        .finally(async () => await page.close());
 }
 
 function isXhr(request) {
