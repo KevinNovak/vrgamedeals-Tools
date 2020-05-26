@@ -1,15 +1,19 @@
 const _pt = require('promise-timeout');
 
-async function scrapePage(browser, url) {
-    const page = await browser.newPage();
-    await page.goto(url).catch(async error => {
-        await page.close();
-        throw error;
-    });
+async function scrapePage(page, url) {
+    // let loggedIn = await isLoggedIn(page);
+    // if (!loggedIn) {
+    //     await login(page);
+    // }
 
-    let loggedIn = await isLoggedIn(page);
+    // await page.goto(url);
 
-    let getJson = new Promise(async (resolve, reject) => {
+    page.goto(url);
+    return await _pt.timeout(getAppData(page), 10 * 1000);
+}
+
+function getAppData(page) {
+    return new Promise(async (resolve, reject) => {
         page.on('response', async response => {
             let request = response.request();
             // Check request type is XHR
@@ -46,17 +50,14 @@ async function scrapePage(browser, url) {
             resolve(node);
         });
     });
-
-    return await _pt
-        .timeout(getJson, 5 * 1000)
-        .catch(async error => {
-            throw error;
-        })
-        .finally(async () => await page.close());
 }
 
 async function isLoggedIn(page) {
     return (await page.$('._1afi')) !== null;
+}
+
+async function login(page) {
+    return;
 }
 
 function isXhr(request) {

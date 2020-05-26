@@ -96,14 +96,29 @@ async function main() {
 
     _app.post('/api/oculus/experience-scrape', async (req, res) => {
         let experienceUrl = req.body.url;
+        let page;
         try {
-            let experiencePageData = await _oculusScraper.scrapePage(browser, experienceUrl);
+            page = await browser.newPage();
+        } catch(error) {
+            _logger.error(error);
+            res.status(500).json({ message: 'Could not create a new page.' });
+            return;
+        }
+
+        try {
+            let experiencePageData = await _oculusScraper.scrapePage(page, experienceUrl);
             res.status(200).json(experiencePageData);
             return;
         } catch (error) {
             _logger.error(error);
             res.status(500).json({ message: 'Error scraping page data.' });
             return;
+        } finally {
+            try {
+                await page.close();
+            } catch (error) {
+                _logger.error('CRITICAL: Could not close page after encountering error.', error);
+            }
         }
     });
 
