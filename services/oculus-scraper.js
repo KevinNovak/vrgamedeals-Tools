@@ -1,14 +1,17 @@
 const _pt = require('promise-timeout');
 
 async function scrapePage(page, url) {
-    // let loggedIn = await isLoggedIn(page);
-    // if (!loggedIn) {
-    //     await login(page);
-    // }
+    await page.goto(url);
 
-    // await page.goto(url);
+    let loggedIn = await isLoggedIn(page);
+    console.log(loggedIn);
 
-    page.goto(url);
+    if (!loggedIn) {
+        await login(page);
+    }
+
+    await page.goto(url);
+
     return await _pt.timeout(getAppData(page), 10 * 1000);
 }
 
@@ -53,10 +56,15 @@ function getAppData(page) {
 }
 
 async function isLoggedIn(page) {
-    return (await page.$('._1afi')) !== null;
+    return (await page.$('._8gvi')) !== null;
 }
 
 async function login(page) {
+    await page.goto('https://auth.oculus.com/login-without-facebook/');
+    await page.type('input#email', process.env.OCULUS_USERNAME);
+    await page.type('input#password', process.env.OCULUS_PASSWORD);
+    await page.click('button#sign_in');
+    await page.waitForNavigation();
     return;
 }
 
