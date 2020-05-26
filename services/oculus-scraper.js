@@ -7,6 +7,8 @@ async function scrapePage(browser, url) {
         throw error;
     });
 
+    let loggedIn = await isLoggedIn(page);
+
     let getJson = new Promise(async (resolve, reject) => {
         page.on('response', async response => {
             let request = response.request();
@@ -51,6 +53,10 @@ async function scrapePage(browser, url) {
             throw error;
         })
         .finally(async () => await page.close());
+}
+
+async function isLoggedIn(page) {
+    return (await page.$('._1afi')) !== null;
 }
 
 function isXhr(request) {
