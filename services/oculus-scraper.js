@@ -1,11 +1,16 @@
 const _pt = require('promise-timeout');
 
+const _logger = require('../services/logger');
+
 async function scrapePage(page, url) {
-    return await _pt.timeout(getAppData(page, url), 20 * 1000);
+    _logger.info(`[Oculus] Scraping '${url}'...`);
+    return await _pt.timeout(getAppData(page, url), 30 * 1000);
 }
 
 function getAppData(page, url) {
     return new Promise(async (resolve, reject) => {
+        _logger.info('[Oculus] Waiting for app data...');
+
         page.on('response', async response => {
             let request = response.request();
             // Check request type is XHR
@@ -38,6 +43,7 @@ function getAppData(page, url) {
             }
 
             // Close the page and return result
+            _logger.info('[Oculus] Found app data!');
             resolve(node);
         });
 
@@ -45,8 +51,16 @@ function getAppData(page, url) {
 
         let loggedIn = await isLoggedIn(page);
         if (!loggedIn) {
+            _logger.info('[Oculus] User is not logged in, logging in...');
             await login(page);
+
             await page.goto(url);
+            let loggedIn = await isLoggedIn(page);
+            if (loggedIn) {
+                _logger.info('[Oculus] Successfully logged in!');
+            } else {
+                _logger.error('[Oculus] Failed to login!');
+            }
         }
     });
 }
