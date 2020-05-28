@@ -1,21 +1,10 @@
 const _pt = require('promise-timeout');
 
 async function scrapePage(page, url) {
-    await page.goto(url);
-
-    let loggedIn = await isLoggedIn(page);
-    console.log(loggedIn);
-
-    if (!loggedIn) {
-        await login(page);
-    }
-
-    await page.goto(url);
-
-    return await _pt.timeout(getAppData(page), 10 * 1000);
+    return await _pt.timeout(getAppData(page, url), 20 * 1000);
 }
 
-function getAppData(page) {
+function getAppData(page, url) {
     return new Promise(async (resolve, reject) => {
         page.on('response', async response => {
             let request = response.request();
@@ -51,6 +40,14 @@ function getAppData(page) {
             // Close the page and return result
             resolve(node);
         });
+
+        await page.goto(url);
+
+        let loggedIn = await isLoggedIn(page);
+        if (!loggedIn) {
+            await login(page);
+            await page.goto(url);
+        }
     });
 }
 
