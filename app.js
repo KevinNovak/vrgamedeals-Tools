@@ -1,3 +1,4 @@
+require('dotenv').config();
 const _express = require('express');
 const _app = _express();
 const _bodyParser = require('body-parser');
@@ -99,7 +100,7 @@ async function main() {
         let page;
         try {
             page = await browser.newPage();
-        } catch(error) {
+        } catch (error) {
             _logger.error(error);
             res.status(500).json({ message: 'Could not create a new page.' });
             return;

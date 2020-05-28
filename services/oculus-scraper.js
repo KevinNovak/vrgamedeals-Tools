@@ -26,7 +26,6 @@ function getAppData(page) {
 
             // Check URL starts with what we want
             let requestUrl = request.url();
-            console.log(requestUrl);
             if (!requestUrl.startsWith('https://graph.oculus.com/graphql')) {
                 return;
             }
