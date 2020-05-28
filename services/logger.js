@@ -1,13 +1,13 @@
 function info(message) {
     console.log({
-        timestamp: Date.now(),
+        timestamp: new Date().toISOString(),
         message,
     });
 }
 
 function error(error) {
     console.log({
-        timestamp: Date.now(),
+        timestamp: new Date().toISOString(),
         error: error.stack,
     });
 }
