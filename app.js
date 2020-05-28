@@ -9,6 +9,7 @@ const _steamScraper = require('./services/steam-scraper');
 const _oculusScraper = require('./services/oculus-scraper');
 const _logger = require('./services/logger');
 
+let Debug = require('./debug.json');
 const PORT = process.env.PORT || 8080;
 let browser;
 
@@ -123,7 +124,7 @@ async function main() {
         }
     });
 
-    browser = await _puppeteer.launch({ args: ['--no-sandbox'], headless: true });
+    browser = await _puppeteer.launch({ args: ['--no-sandbox'], headless: !Debug.enabled });
 
     _app.listen(PORT, () => {
         _logger.info(`App listening on port ${PORT}!`);
