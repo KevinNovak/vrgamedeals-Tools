@@ -1,15 +1,13 @@
 function info(message) {
-    console.log({
-        timestamp: new Date().toISOString(),
-        message,
-    });
+    console.log(`[${getTimestamp()}]`, message);
 }
 
 function error(error) {
-    console.log({
-        timestamp: new Date().toISOString(),
-        error: error.stack,
-    });
+    console.log(`[${getTimestamp()}]`, error);
+}
+
+function getTimestamp() {
+    return new Date().toISOString();
 }
 
 module.exports = {
