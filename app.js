@@ -25,7 +25,7 @@ async function main() {
             appPageHtml = await _httpClient.get(appUrl);
         } catch (error) {
             _logger.error(error);
-            res.status(500).json({ message: 'Error retrieving page HTML.' });
+            res.status(500).json({ message: 'Error retrieving page HTML.', error });
             return;
         }
 
@@ -36,12 +36,12 @@ async function main() {
             return;
         } catch (error) {
             if (error.type == 'NO_GAME_ELEMENTS') {
-                res.status(400).json({ message: error.message });
+                res.status(400).json({ message: 'No game elements.', error });
                 return;
             }
 
             _logger.error(error);
-            res.status(500).json({ message: 'Error scraping page data.' });
+            res.status(500).json({ message: 'Error scraping page data.', error });
             return;
         }
     });
@@ -53,7 +53,7 @@ async function main() {
             searchPageHtml = await _httpClient.get(searchUrl);
         } catch (error) {
             _logger.error(error);
-            res.status(500).json({ message: 'Error retrieving page HTML.' });
+            res.status(500).json({ message: 'Error retrieving page HTML.', error });
             return;
         }
 
@@ -63,7 +63,7 @@ async function main() {
             return;
         } catch (error) {
             _logger.error(error);
-            res.status(500).json({ message: 'Error scraping page data.' });
+            res.status(500).json({ message: 'Error scraping page data.', error });
             return;
         }
     });
@@ -75,7 +75,7 @@ async function main() {
             appPageHtml = await _httpClient.get(appUrl);
         } catch (error) {
             _logger.error(error);
-            res.status(500).json({ message: 'Error retrieving page HTML.' });
+            res.status(500).json({ message: 'Error retrieving page HTML.', error });
             return;
         }
 
@@ -85,12 +85,12 @@ async function main() {
             return;
         } catch (error) {
             if (error.type == 'NO_GAME_ELEMENTS') {
-                res.status(400).json({ message: error.message });
+                res.status(400).json({ message: 'No game elements.', error });
                 return;
             }
 
             _logger.error(error);
-            res.status(500).json({ message: 'Error scraping page data.' });
+            res.status(500).json({ message: 'Error scraping page data.', error });
             return;
         }
     });
@@ -102,7 +102,7 @@ async function main() {
             page = await browser.newPage();
         } catch (error) {
             _logger.error(error);
-            res.status(500).json({ message: 'Could not create a new page.' });
+            res.status(500).json({ message: 'Could not create a new page.', error });
             return;
         }
 
@@ -112,7 +112,7 @@ async function main() {
             return;
         } catch (error) {
             _logger.error(error);
-            res.status(500).json({ message: 'Error scraping page data.' });
+            res.status(500).json({ message: 'Error scraping page data.', error });
             return;
         } finally {
             try {
