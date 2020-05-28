@@ -47,20 +47,40 @@ function getAppData(page, url) {
             resolve(node);
         });
 
-        await page.goto(url);
+        _logger.info('[Oculus] Navigating to page.');
+        try {
+            await page.goto(url);
+        } catch (error) {
+            if (error.message.toLowerCase().includes('browser has disconnected')) {
+                _logger.info('[Oculus] Found before navigating completed!');
+                return;
+            }
+            throw error;
+        }
 
         let loggedIn = await isLoggedIn(page);
         if (!loggedIn) {
             _logger.info('[Oculus] User is not logged in, logging in...');
             await login(page);
-
-            await page.goto(url);
             let loggedIn = await isLoggedIn(page);
             if (loggedIn) {
                 _logger.info('[Oculus] Successfully logged in!');
             } else {
                 _logger.error('[Oculus] Failed to login!');
             }
+
+            try {
+                await page.goto(url);
+            } catch (error) {
+                if (error.message.toLowerCase().includes('browser has disconnected')) {
+                    _logger.info('[Oculus] Found before navigating completed!');
+                    return;
+                }
+                throw error;
+            }
+            _logger.info('[Oculus] Navigated to page.');
+        } else {
+            _logger.info('[Oculus] User is logged in!');
         }
     });
 }
