@@ -79,25 +79,37 @@ async function isLoggedIn(page) {
 async function login(browser) {
     let page;
     try {
+        _logger.info('1');
         page = await browser.newPage();
+        _logger.info('2');
     } catch (error) {
         _logger.error(error);
         return;
     }
 
     try {
+        _logger.info('3');
         await page.goto('https://auth.oculus.com/login-without-facebook/', {
             waitUntil: 'domcontentloaded',
             timeout: 0,
         });
+        _logger.info('4');
         await page.waitFor('input#email', { timeout: 0 });
+        _logger.info('5');
         await page.type('input#email', process.env.OCULUS_USERNAME);
+        _logger.info('6');
         await page.waitFor('input#password', { timeout: 0 });
+        _logger.info('7');
         await page.type('input#password', process.env.OCULUS_PASSWORD);
+        _logger.info('8');
         await page.waitFor('button#sign_in', { timeout: 0 });
+        _logger.info('9');
         await page.click('button#sign_in');
+        _logger.info('10');
         await page.waitForNavigation();
+        _logger.info('11');
         let loggedIn = await isLoggedIn(page);
+        _logger.info('12');
         if (loggedIn) {
             _logger.info('[Oculus] Successfully logged in!');
         } else {
