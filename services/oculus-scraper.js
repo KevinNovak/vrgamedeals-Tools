@@ -89,12 +89,21 @@ async function login(browser) {
 
     try {
         _logger.info('3');
-        await page.goto('https://auth.oculus.com/login-without-facebook/', {
-            waitUntil: 'load',
+        page.goto('https://auth.oculus.com/login-without-facebook/', {
+            waitUntil: 'domcontentloaded',
             timeout: 0,
         });
         _logger.info('4');
-        await page.screenshot({ path: 'screenshot.png' });
+        await page.waitFor(1000);
+        await page.screenshot({ path: 'screenshot-1.png' });
+        await page.waitFor(2000);
+        await page.screenshot({ path: 'screenshot-2.png' });
+        await page.waitFor(4000);
+        await page.screenshot({ path: 'screenshot-3.png' });
+        await page.waitFor(8000);
+        await page.screenshot({ path: 'screenshot-4.png' });
+        await page.waitFor(16000);
+        await page.screenshot({ path: 'screenshot-5.png' });
         _logger.info('5');
         await page.type('input#email', process.env.OCULUS_USERNAME);
         _logger.info('6');
