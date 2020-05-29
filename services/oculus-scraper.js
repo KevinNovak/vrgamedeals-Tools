@@ -82,9 +82,15 @@ async function isLoggedIn(page) {
 }
 
 async function login(page) {
-    await page.goto('https://auth.oculus.com/login-without-facebook/');
+    await page.goto('https://auth.oculus.com/login-without-facebook/', {
+        waitUntil: 'domcontentloaded',
+        timeout: 0,
+    });
+    await page.waitFor('input#email', { timeout: 0 });
     await page.type('input#email', process.env.OCULUS_USERNAME);
+    await page.waitFor('input#password', { timeout: 0 });
     await page.type('input#password', process.env.OCULUS_PASSWORD);
+    await page.waitFor('button#sign_in', { timeout: 0 });
     await page.click('button#sign_in');
     await page.waitForNavigation();
     return;
