@@ -2,12 +2,12 @@ const _pt = require('promise-timeout');
 
 const _logger = require('../services/logger');
 
-async function scrapePage(page, url) {
+async function scrapePage(browser, page, url) {
     _logger.info(`[Oculus] Scraping '${url}'...`);
-    return await _pt.timeout(getAppData(page, url), 60 * 1000);
+    return await _pt.timeout(getAppData(browser, page, url), 60 * 1000);
 }
 
-function getAppData(page, url) {
+function getAppData(browser, page, url) {
     return new Promise(async (resolve, reject) => {
         _logger.info('[Oculus] Waiting for app data...');
 
@@ -53,23 +53,18 @@ function getAppData(page, url) {
 
             let loggedIn = await isLoggedIn(page);
             if (!loggedIn) {
+                reject('User is not logged in!');
                 _logger.info('[Oculus] User is not logged in, logging in...');
-                await login(page);
-                let loggedIn = await isLoggedIn(page);
-                if (loggedIn) {
-                    _logger.info('[Oculus] Successfully logged in!');
-                } else {
-                    _logger.error('[Oculus] Failed to login!');
-                }
-
-                await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 0 });
-                _logger.info('[Oculus] Navigated to page.');
+                await login(browser);
             } else {
                 _logger.info('[Oculus] User is logged in!');
             }
         } catch (error) {
-            if (error.message.toLowerCase().includes('browser has disconnected')) {
-                _logger.info('[Oculus] Browser disconnected!');
+            if (
+                error.message.includes('browser has disconnected') ||
+                error.message.includes('Session closed')
+            ) {
+                _logger.info('[Oculus] Browser or page disconnected!');
                 return;
             }
             throw error;
@@ -81,19 +76,42 @@ async function isLoggedIn(page) {
     return (await page.$('._8gvi')) !== null;
 }
 
-async function login(page) {
-    await page.goto('https://auth.oculus.com/login-without-facebook/', {
-        waitUntil: 'domcontentloaded',
-        timeout: 0,
-    });
-    await page.waitFor('input#email', { timeout: 0 });
-    await page.type('input#email', process.env.OCULUS_USERNAME);
-    await page.waitFor('input#password', { timeout: 0 });
-    await page.type('input#password', process.env.OCULUS_PASSWORD);
-    await page.waitFor('button#sign_in', { timeout: 0 });
-    await page.click('button#sign_in');
-    await page.waitForNavigation();
-    return;
+async function login(browser) {
+    let page;
+    try {
+        page = await browser.newPage();
+    } catch (error) {
+        _logger.error(error);
+        return;
+    }
+
+    try {
+        await page.goto('https://auth.oculus.com/login-without-facebook/', {
+            waitUntil: 'domcontentloaded',
+            timeout: 0,
+        });
+        await page.waitFor('input#email', { timeout: 0 });
+        await page.type('input#email', process.env.OCULUS_USERNAME);
+        await page.waitFor('input#password', { timeout: 0 });
+        await page.type('input#password', process.env.OCULUS_PASSWORD);
+        await page.waitFor('button#sign_in', { timeout: 0 });
+        await page.click('button#sign_in');
+        await page.waitForNavigation();
+        let loggedIn = await isLoggedIn(page);
+        if (loggedIn) {
+            _logger.info('[Oculus] Successfully logged in!');
+        } else {
+            _logger.error('[Oculus] Failed to login!');
+        }
+    } catch (error) {
+        _logger.error(error);
+    } finally {
+        try {
+            await page.close();
+        } catch (error) {
+            _logger.error('CRITICAL: Could not close page after encountering error.', error);
+        }
+    }
 }
 
 function isXhr(request) {

@@ -113,7 +113,7 @@ async function retrieveSteamAppTitle() {
     };
 
     try {
-        let appData = await post('./api/steam/app-scrape', content);
+        let appData = await post('./api/steam/app-scrape', content, MAX_RETRIES);
 
         let text = '';
         if (appData.headsets.length > 0) {
@@ -192,7 +192,7 @@ async function retrieveSteamSearchTable() {
                     url: app.link,
                 };
 
-                let appData = await post('./api/steam/search-app-scrape', content);
+                let appData = await post('./api/steam/search-app-scrape', content, MAX_RETRIES);
                 app.headsets = appData.headsets || [];
                 app.countdown = appData.countdown || { text: '', time: 0 };
                 app.vrSupport = appData.vrSupport || '';
@@ -254,7 +254,7 @@ async function retrieveOculusExperienceTitle() {
     };
 
     try {
-        let appData = await post('./api/oculus/experience-scrape', content);
+        let appData = await post('./api/oculus/experience-scrape', content, 1);
 
         let text = '';
         let supportedHeadsets = appData.supported_hmd_platforms;
@@ -351,7 +351,7 @@ async function retrieveSearchPageData(steamSearchUrl, pageNumber) {
     if (pageNumber) {
         content.url += `&page=${pageNumber}`;
     }
-    return await post('./api/steam/search-scrape', content);
+    return await post('./api/steam/search-scrape', content, MAX_RETRIES);
 }
 
 function createMarkdownTable(formattedSearchData) {
@@ -370,9 +370,9 @@ function convertToRow(app) {
     return `| ${app.platformAbbreviated} | ${app.titleLink} | ${app.price} | ${app.percentOff} | ${app.reviews} | ${app.reviewsCount} |`;
 }
 
-async function post(url, content) {
+async function post(url, content, maxAttempts) {
     let response;
-    for (let i = 0; i < MAX_RETRIES; i++) {
+    for (let i = 0; i < maxAttempts; i++) {
         response = await fetch(url, {
             method: 'POST',
             headers: {

@@ -108,7 +108,7 @@ async function main() {
         }
 
         try {
-            let experiencePageData = await _oculusScraper.scrapePage(page, experienceUrl);
+            let experiencePageData = await _oculusScraper.scrapePage(browser, page, experienceUrl);
             res.status(200).json(experiencePageData);
             return;
         } catch (error) {
