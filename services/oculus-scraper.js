@@ -4,7 +4,7 @@ const _logger = require('../services/logger');
 
 async function scrapePage(page, url) {
     _logger.info(`[Oculus] Scraping '${url}'...`);
-    return await _pt.timeout(getAppData(page, url), 10 * 1000);
+    return await _pt.timeout(getAppData(page, url), 30 * 1000);
 }
 
 function getAppData(page, url) {
@@ -69,7 +69,7 @@ function getAppData(page, url) {
             }
         } catch (error) {
             if (error.message.toLowerCase().includes('browser has disconnected')) {
-                _logger.info('[Oculus] Found before navigating completed!');
+                _logger.info('[Oculus] Browser disconnected!');
                 return;
             }
             throw error;
