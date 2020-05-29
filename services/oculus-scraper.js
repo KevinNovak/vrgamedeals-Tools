@@ -48,7 +48,7 @@ function getAppData(page, url) {
         });
 
         try {
-            await page.goto(url);
+            await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 0 });
             _logger.info('[Oculus] Navigated to page.');
 
             let loggedIn = await isLoggedIn(page);
@@ -62,7 +62,7 @@ function getAppData(page, url) {
                     _logger.error('[Oculus] Failed to login!');
                 }
 
-                await page.goto(url);
+                await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 0 });
                 _logger.info('[Oculus] Navigated to page.');
             } else {
                 _logger.info('[Oculus] User is logged in!');
