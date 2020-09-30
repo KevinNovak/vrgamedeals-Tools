@@ -10,7 +10,7 @@
     },
     "main": "dist/app.js",
     "scripts": {
-        "start": "tsc && node dist/app.js",
+        "start": "node dist/app.js",
         "start-pm2": "tsc && pm2 start process.json",
         "stop-pm2": "pm2 stop process.json",
         "delete-pm2": "pm2 delete process.json",
