@@ -1,3 +1,5 @@
+import { Response } from 'node-fetch';
+
 export class Logger {
     public static info(message: string): void {
         let log = `[Info] ${message}`;
@@ -20,6 +22,22 @@ export class Logger {
         }
 
         switch (error.constructor) {
+            case Response:
+                let res = error as Response;
+                let resText: string;
+                try {
+                    resText = await res.text();
+                } catch {
+                    // Ignore
+                }
+                console.error({
+                    path: res.url,
+                    statusCode: res.status,
+                    statusName: res.statusText,
+                    headers: res.headers.raw(),
+                    body: resText,
+                });
+                break;
             default:
                 console.error(error);
                 break;
