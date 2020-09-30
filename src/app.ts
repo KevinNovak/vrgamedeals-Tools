@@ -1,5 +1,5 @@
 import express from 'express';
-import puppeteer from 'puppeteer';
+import puppeteer, { Page } from 'puppeteer';
 
 import { HttpService, Logger, OculusScraper, SteamScraper } from './services';
 
@@ -23,7 +23,7 @@ async function start(): Promise<void> {
     app.post('/api/steam/app-scrape', async (req, res) => {
         let appUrl = req.body.url;
 
-        let appPageHtml;
+        let appPageHtml: string;
         try {
             appPageHtml = await httpService.get(appUrl);
         } catch (error) {
@@ -51,7 +51,7 @@ async function start(): Promise<void> {
 
     app.post('/api/steam/search-scrape', async (req, res) => {
         let searchUrl = req.body.url;
-        let searchPageHtml;
+        let searchPageHtml: string;
         try {
             searchPageHtml = await httpService.get(searchUrl);
         } catch (error) {
@@ -73,7 +73,7 @@ async function start(): Promise<void> {
 
     app.post('/api/steam/search-app-scrape', async (req, res) => {
         let appUrl = req.body.url;
-        let appPageHtml;
+        let appPageHtml: string;
         try {
             appPageHtml = await httpService.get(appUrl);
         } catch (error) {
@@ -100,7 +100,7 @@ async function start(): Promise<void> {
 
     app.post('/api/oculus/experience-scrape', async (req, res) => {
         let experienceUrl = req.body.url;
-        let page;
+        let page: Page;
         try {
             page = await browser.newPage();
         } catch (error) {

@@ -1,14 +1,15 @@
 import pt from 'promise-timeout';
+import { Browser, Page, Request, Response } from 'puppeteer';
 
 import { Logger } from '.';
 
 export class OculusScraper {
-    public async scrapePage(browser, page, url) {
+    public async scrapePage(browser: Browser, page: Page, url: string) {
         Logger.info(`[Oculus] Scraping '${url}'...`);
         return await pt.timeout(this.getAppData(browser, page, url), 60 * 1000);
     }
 
-    private getAppData(browser, page, url) {
+    private getAppData(browser: Browser, page: Page, url: string) {
         return new Promise(async (resolve, reject) => {
             Logger.info('[Oculus] Waiting for app data...');
 
@@ -73,12 +74,12 @@ export class OculusScraper {
         });
     }
 
-    private async isLoggedIn(page) {
+    private async isLoggedIn(page: Page): Promise<boolean> {
         return (await page.$('._8gvi')) !== null;
     }
 
-    private async login(browser) {
-        let page;
+    private async login(browser: Browser): Promise<void> {
+        let page: Page;
         try {
             Logger.info('1');
             page = await browser.newPage();
@@ -132,11 +133,11 @@ export class OculusScraper {
         }
     }
 
-    private isXhr(request) {
+    private isXhr(request: Request): boolean {
         return ['xhr', 'fetch'].includes(request.resourceType().toLowerCase());
     }
 
-    private async toJson(response) {
+    private async toJson(response: Response): Promise<any> {
         try {
             return await response.json();
         } catch (error) {
