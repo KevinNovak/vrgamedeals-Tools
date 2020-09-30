@@ -1,4 +1,3 @@
-import bodyParser from 'body-parser';
 import express from 'express';
 import puppeteer from 'puppeteer';
 
@@ -18,9 +17,8 @@ async function start(): Promise<void> {
     let oculusScraper = new OculusScraper();
 
     let app = express();
+    app.use(express.json());
     app.use(express.static('public'));
-    app.use(bodyParser.urlencoded({ extended: false }));
-    app.use(bodyParser.json());
 
     app.post('/api/steam/app-scrape', async (req, res) => {
         let appUrl = req.body.url;
