@@ -15,7 +15,7 @@ export class SteamScraper {
     public getAppPageData(appPageHtml: string): AppPageData {
         let firstGame = this.getMainGameElement(appPageHtml);
         if (!firstGame) {
-            throw new CustomException('NO_GAME_ELEMENTS', 'Could not find any game elements.');
+            return;
         }
 
         let title = this.getTitle(appPageHtml);
@@ -54,7 +54,7 @@ export class SteamScraper {
     public getSearchAppPageData(appPageHtml: string): SearchAppPageData {
         let firstGame = this.getMainGameElement(appPageHtml);
         if (!firstGame) {
-            throw new CustomException('NO_GAME_ELEMENTS', 'Could not find any game elements.');
+            return;
         }
 
         let countdown = this.getCountdownFromGameElement(firstGame);

@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import router from 'express-promise-router';
-import { Browser, Page } from 'puppeteer';
+import { Browser } from 'puppeteer';
 
 import { HttpService, Logger, OculusScraper, SteamScraper } from '../services';
 import { Controller } from './controller';
@@ -28,106 +28,49 @@ export class ScrapeController implements Controller {
     }
 
     private async steamAppScrape(req: Request, res: Response) {
-        let appUrl = req.body.url;
+        let appPageHtml = await this.httpService.get(req.body.url);
 
-        let appPageHtml: string;
-        try {
-            appPageHtml = await this.httpService.get(appUrl);
-        } catch (error) {
-            Logger.error(error);
-            res.status(500).json({ message: 'Error retrieving page HTML.', error });
+        let appPageData = this.steamScraper.getAppPageData(appPageHtml);
+        if (!appPageData) {
+            res.status(400).json({ message: 'No game elements.' });
             return;
         }
 
-        try {
-            let appPageData = this.steamScraper.getAppPageData(appPageHtml);
-            appPageData.link = appUrl;
-            res.status(200).json(appPageData);
-            return;
-        } catch (error) {
-            if (error.type === 'NO_GAME_ELEMENTS') {
-                res.status(400).json({ message: 'No game elements.', error });
-                return;
-            }
+        appPageData.link = req.body.url;
 
-            Logger.error(error);
-            res.status(500).json({ message: 'Error scraping page data.', error });
-            return;
-        }
+        res.status(200).json(appPageData);
     }
 
     private async steamSearchScrape(req: Request, res: Response) {
-        let searchUrl = req.body.url;
-        let searchPageHtml: string;
-        try {
-            searchPageHtml = await this.httpService.get(searchUrl);
-        } catch (error) {
-            Logger.error(error);
-            res.status(500).json({ message: 'Error retrieving page HTML.', error });
-            return;
-        }
+        let searchPageHtml = await this.httpService.get(req.body.url);
 
-        try {
-            let searchPageData = this.steamScraper.getSearchPageData(searchPageHtml);
-            res.status(200).json(searchPageData);
-            return;
-        } catch (error) {
-            Logger.error(error);
-            res.status(500).json({ message: 'Error scraping page data.', error });
-            return;
-        }
+        let searchPageData = this.steamScraper.getSearchPageData(searchPageHtml);
+        res.status(200).json(searchPageData);
     }
 
     private async steamSearchAppScrape(req: Request, res: Response) {
-        let appUrl = req.body.url;
-        let appPageHtml: string;
-        try {
-            appPageHtml = await this.httpService.get(appUrl);
-        } catch (error) {
-            Logger.error(error);
-            res.status(500).json({ message: 'Error retrieving page HTML.', error });
+        let appPageHtml = await this.httpService.get(req.body.url);
+
+        let appPageData = this.steamScraper.getSearchAppPageData(appPageHtml);
+        if (!appPageData) {
+            res.status(400).json({ message: 'No game elements.' });
             return;
         }
 
-        try {
-            let appPageData = this.steamScraper.getSearchAppPageData(appPageHtml);
-            res.status(200).json(appPageData);
-            return;
-        } catch (error) {
-            if (error.type === 'NO_GAME_ELEMENTS') {
-                res.status(400).json({ message: 'No game elements.', error });
-                return;
-            }
-
-            Logger.error(error);
-            res.status(500).json({ message: 'Error scraping page data.', error });
-            return;
-        }
+        res.status(200).json(appPageData);
     }
 
     private async oculusExperienceScrape(req: Request, res: Response) {
-        let experienceUrl = req.body.url;
-        let page: Page;
-        try {
-            page = await this.browser.newPage();
-        } catch (error) {
-            Logger.error(error);
-            res.status(500).json({ message: 'Could not create a new page.', error });
-            return;
-        }
+        let page = await this.browser.newPage();
 
         try {
             let experiencePageData = await this.oculusScraper.scrapePage(
                 this.browser,
                 page,
-                experienceUrl
+                req.body.url
             );
+
             res.status(200).json(experiencePageData);
-            return;
-        } catch (error) {
-            Logger.error(error);
-            res.status(500).json({ message: 'Error scraping page data.', error });
-            return;
         } finally {
             try {
                 await page.close();
