@@ -1,6 +1,5 @@
 import cheerio from 'cheerio';
 
-import { CustomException } from '../models/exception-models';
 import {
     AppPageData,
     CountdownData,
