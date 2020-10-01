@@ -16,7 +16,7 @@ async function start(): Promise<void> {
     // Browser
     let browser = await puppeteer.launch({
         args: ['--no-sandbox'],
-        headless: !Debug.enabled,
+        headless: !Debug.showBrowser,
         userDataDir: './data',
     });
 
