@@ -1,7 +1,9 @@
 {
     "info": {
-        "started": "Application started."
+        "started": "Application started on port {PORT}."
     },
     "warn": {},
-    "error": {}
+    "error": {
+        "processRequest": "An error occurred while processing a '{HTTP_METHOD}' request to '{URL}'."
+    }
 }
