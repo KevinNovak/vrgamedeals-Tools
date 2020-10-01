@@ -28,49 +28,42 @@ export class ScrapeController implements Controller {
     }
 
     private async steamAppScrape(req: Request, res: Response) {
-        let appPageHtml = await this.httpService.get(req.body.url);
+        let html = await this.httpService.get(req.body.url);
 
-        let appPageData = this.steamScraper.getAppPageData(appPageHtml);
-        if (!appPageData) {
+        let data = this.steamScraper.getAppPageData(html);
+        if (!data) {
             res.status(400).json({ message: 'No game elements.' });
             return;
         }
 
-        appPageData.link = req.body.url;
-
-        res.status(200).json(appPageData);
+        data.link = req.body.url;
+        res.status(200).json(data);
     }
 
     private async steamSearchScrape(req: Request, res: Response) {
-        let searchPageHtml = await this.httpService.get(req.body.url);
-
-        let searchPageData = this.steamScraper.getSearchPageData(searchPageHtml);
-        res.status(200).json(searchPageData);
+        let html = await this.httpService.get(req.body.url);
+        let data = this.steamScraper.getSearchPageData(html);
+        res.status(200).json(data);
     }
 
     private async steamSearchAppScrape(req: Request, res: Response) {
-        let appPageHtml = await this.httpService.get(req.body.url);
+        let html = await this.httpService.get(req.body.url);
 
-        let appPageData = this.steamScraper.getSearchAppPageData(appPageHtml);
-        if (!appPageData) {
+        let data = this.steamScraper.getSearchAppPageData(html);
+        if (!data) {
             res.status(400).json({ message: 'No game elements.' });
             return;
         }
 
-        res.status(200).json(appPageData);
+        res.status(200).json(data);
     }
 
     private async oculusExperienceScrape(req: Request, res: Response) {
         let page = await this.browser.newPage();
 
         try {
-            let experiencePageData = await this.oculusScraper.scrapePage(
-                this.browser,
-                page,
-                req.body.url
-            );
-
-            res.status(200).json(experiencePageData);
+            let data = await this.oculusScraper.scrapePage(this.browser, page, req.body.url);
+            res.status(200).json(data);
         } finally {
             try {
                 await page.close();
