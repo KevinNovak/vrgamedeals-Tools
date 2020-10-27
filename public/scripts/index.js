@@ -1,6 +1,5 @@
 const STEAM_APP_URL_REGEX = /^https:\/\/store.steampowered.com\/app\/\d+/;
 const STEAM_SEARCH_URL_REGEX = /^https:\/\/store.steampowered.com\/search\/\S*/;
-const OCULUS_EXPERIENCE_URL_REGEX = /^https:\/\/www.oculus.com\/experiences\/(rift|quest|go)\/\d+/;
 
 const PRICE_NUMBER_REGEX = /\$(\d+\.\d{2})/;
 const PERCENT_NUMBER_REGEX = /(\d+)%/;
@@ -67,13 +66,6 @@ let steamSearchResultsDiv = document.getElementById('steam-search-results');
 let steamSearchResultTextArea = document.getElementById('steam-search-result-textarea');
 let steamSearchDownloadLink = document.getElementById('steam-search-download-link');
 
-// Oculus Experience Titler
-let oculusExperienceBtn = document.getElementById('oculus-experience-btn');
-let oculusExperienceUrlInput = document.getElementById('oculus-experience-url-input');
-let oculusExperienceInfoSpan = document.getElementById('oculus-experience-info-span');
-let oculusExperienceResultsDiv = document.getElementById('oculus-experience-results');
-let oculusExperienceResultLink = document.getElementById('oculus-experience-result-link');
-
 // Register events
 steamAppUrlInput.addEventListener('keyup', event => {
     if (event.keyCode === 13) {
@@ -86,13 +78,6 @@ steamSearchUrlInput.addEventListener('keyup', event => {
     if (event.keyCode === 13) {
         event.preventDefault();
         steamSearchBtn.click();
-    }
-});
-
-oculusExperienceUrlInput.addEventListener('keyup', event => {
-    if (event.keyCode === 13) {
-        event.preventDefault();
-        oculusExperienceBtn.click();
     }
 });
 
@@ -231,64 +216,6 @@ async function retrieveSteamSearchTable() {
     }
 
     steamSearchBtn.disabled = false;
-}
-
-async function retrieveOculusExperienceTitle() {
-    oculusExperienceBtn.disabled = true;
-    hideElement(oculusExperienceResultsDiv);
-    setUnhideElement(oculusExperienceInfoSpan, 'Retrieving...');
-
-    let oculusExperienceUrl = oculusExperienceUrlInput.value.trim();
-
-    if (!oculusExperienceUrl || !OCULUS_EXPERIENCE_URL_REGEX.test(oculusExperienceUrl)) {
-        oculusExperienceBtn.disabled = false;
-        setUnhideElement(
-            oculusExperienceInfoSpan,
-            'No results. Please input a valid Oculus Experience URL.'
-        );
-        return;
-    }
-
-    let content = {
-        url: oculusExperienceUrl,
-    };
-
-    try {
-        let appData = await post('./api/oculus/experience-scrape', content, 1);
-
-        let text = '';
-        let supportedHeadsets = appData.supported_hmd_platforms;
-
-        // Combine Rift and Rift S
-        if (supportedHeadsets.includes('RIFT') && supportedHeadsets.includes('LAGUNA')) {
-            supportedHeadsets = supportedHeadsets.filter(headset => headset != 'RIFT');
-        }
-
-        // Remove Gear VR
-        if (supportedHeadsets.includes('GEARVR')) {
-            supportedHeadsets = supportedHeadsets.filter(headset => headset != 'GEARVR');
-        }
-
-        let platforms = getPlatformText(supportedHeadsets);
-        text += `[${platforms}] `;
-        text += `${appData.display_name} `;
-        let priceTag = appData.current_offer.promo_benefit
-            ? `(${appData.current_offer.price.formatted} / ${appData.current_offer.promo_benefit})`
-            : `(${appData.current_offer.price.formatted})`;
-        text += `${priceTag}`;
-
-        hideElement(oculusExperienceInfoSpan);
-
-        oculusExperienceResultLink.href = oculusExperienceUrl;
-        oculusExperienceResultLink.innerHTML = text;
-        unhideElement(oculusExperienceResultsDiv);
-    } catch (error) {
-        console.error(error);
-        hideElement(oculusExperienceResultsDiv);
-        setUnhideElement(oculusExperienceInfoSpan, 'No results.');
-    }
-
-    oculusExperienceBtn.disabled = false;
 }
 
 function getFormattedTime() {

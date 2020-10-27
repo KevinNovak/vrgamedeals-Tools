@@ -1,29 +1,20 @@
 import { Request, Response, Router } from 'express';
 import router from 'express-promise-router';
-import { Browser } from 'puppeteer';
 
-import { HttpService, Logger, OculusScraper, SteamScraper } from '../services';
+import { HttpService, SteamScraper } from '../services';
 import { Controller } from './controller';
 
 export class ScrapeController implements Controller {
     public path = '/';
     public router: Router = router();
 
-    constructor(
-        private browser: Browser,
-        private steamScraper: SteamScraper,
-        private oculusScraper: OculusScraper,
-        private httpService: HttpService
-    ) {
+    constructor(private steamScraper: SteamScraper, private httpService: HttpService) {
         this.router.post('/api/steam/app-scrape', (req, res) => this.steamAppScrape(req, res));
         this.router.post('/api/steam/search-scrape', (req, res) =>
             this.steamSearchScrape(req, res)
         );
         this.router.post('/api/steam/search-app-scrape', (req, res) =>
             this.steamSearchAppScrape(req, res)
-        );
-        this.router.post('/api/oculus/experience-scrape', (req, res) =>
-            this.oculusExperienceScrape(req, res)
         );
     }
 
@@ -56,20 +47,5 @@ export class ScrapeController implements Controller {
         }
 
         res.status(200).json(data);
-    }
-
-    private async oculusExperienceScrape(req: Request, res: Response) {
-        let page = await this.browser.newPage();
-
-        try {
-            let data = await this.oculusScraper.scrapePage(this.browser, page, req.body.url);
-            res.status(200).json(data);
-        } finally {
-            try {
-                await page.close();
-            } catch (error) {
-                Logger.error('CRITICAL: Could not close page after encountering error.', error);
-            }
-        }
     }
 }
