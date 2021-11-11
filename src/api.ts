@@ -20,7 +20,7 @@ export class Api {
         this.app.listen(process.env.PORT || Config.port, () => this.ready());
     }
 
-    private async ready() {
+    private async ready(): Promise<void> {
         Logger.info(Logs.info.started.replace('{PORT}', process.env.PORT || Config.port));
     }
 

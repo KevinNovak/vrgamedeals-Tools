@@ -11,7 +11,7 @@ export class RootController implements Controller {
         this.router.get(this.path, (req, res) => this.get(req, res));
     }
 
-    private async get(req: Request, res: Response) {
+    private async get(req: Request, res: Response): Promise<void> {
         res.status(200).json({ message: 'vrgamedeals Tools' });
     }
 }

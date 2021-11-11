@@ -18,7 +18,7 @@ export class ScrapeController implements Controller {
         );
     }
 
-    private async steamAppScrape(req: Request, res: Response) {
+    private async steamAppScrape(req: Request, res: Response): Promise<void> {
         let html = await this.httpService.get(req.body.url);
 
         let data = this.steamScraper.getAppPageData(html);
@@ -31,13 +31,13 @@ export class ScrapeController implements Controller {
         res.status(200).json(data);
     }
 
-    private async steamSearchScrape(req: Request, res: Response) {
+    private async steamSearchScrape(req: Request, res: Response): Promise<void> {
         let html = await this.httpService.get(req.body.url);
         let data = this.steamScraper.getSearchPageData(html);
         res.status(200).json(data);
     }
 
-    private async steamSearchAppScrape(req: Request, res: Response) {
+    private async steamSearchAppScrape(req: Request, res: Response): Promise<void> {
         let html = await this.httpService.get(req.body.url);
 
         let data = this.steamScraper.getSearchAppPageData(html);

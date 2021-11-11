@@ -10,6 +10,6 @@ export class HttpService {
             throw res;
         }
 
-        return await res.text();
+        return res.text();
     }
 }
