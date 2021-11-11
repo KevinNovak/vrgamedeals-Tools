@@ -2,14 +2,19 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "start",
             "type": "node",
             "request": "launch",
-            "name": "Start",
-            "skipFiles": ["<node_internals>/**"],
-            "program": "${workspaceFolder}\\dist\\app.js",
-            "preLaunchTask": "tsc",
+            "protocol": "inspector",
+            "preLaunchTask": "build",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "node",
+            "args": ["--enable-source-maps", "${workspaceFolder}/dist/app.js"],
+            "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"],
+            "outputCapture": "std",
             "internalConsoleOptions": "openOnSessionStart",
-            "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"]
+            "skipFiles": ["<node_internals>/**"],
+            "restart": false
         }
     ]
 }
