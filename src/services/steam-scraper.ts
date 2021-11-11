@@ -104,7 +104,7 @@ export class SteamScraper {
         let headsets: string[] = [];
 
         for (let headsetElement of headsetElements) {
-            let headsetName = $('.name', headsetElement).text().trim();
+            let headsetName = $('.label', headsetElement).text().trim();
             if (headsetName) {
                 headsets.push(headsetName);
             }
