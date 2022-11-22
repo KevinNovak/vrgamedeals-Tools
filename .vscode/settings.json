@@ -12,10 +12,6 @@
         "editor.formatOnSave": true
     },
     "cSpell.enabled": true,
-    "cSpell.words": [
-        "Novak",
-        "parens",
-        "vrgamedeals"
-    ],
+    "cSpell.words": ["Novak", "parens", "vrgamedeals"],
     "typescript.preferences.importModuleSpecifierEnding": "js"
 }
