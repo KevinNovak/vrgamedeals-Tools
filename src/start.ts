@@ -21,4 +21,6 @@ process.on('unhandledRejection', (reason, promise) => {
     Logger.error('Unhandled promise rejection.', reason);
 });
 
-start();
+start().catch(error => {
+    Logger.error('An unspecified error occurred.', error);
+});

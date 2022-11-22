@@ -8,7 +8,7 @@
     "engines": {
         "node": ">=12.14.0"
     },
-    "main": "dist/app.js",
+    "main": "dist/start.js",
     "scripts": {
         "lint": "tslint --project .",
         "lint:fix": "tslint --fix --project .",
@@ -18,7 +18,7 @@
         "clean:dry": "git clean -xdf --exclude=\"/config/**/*\" --dry-run",
         "build": "tsc",
         "postinstall": "npm run build",
-        "start": "node --enable-source-maps dist/app.js",
+        "start": "node --enable-source-maps dist/start.js",
         "start:pm2": "npm run pm2:start",
         "pm2:start": "pm2 start process.json",
         "pm2:stop": "pm2 stop process.json",
