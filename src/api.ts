@@ -33,7 +33,7 @@ export class Api {
         }
     }
 
-    private handleError: ErrorRequestHandler = (error, req, res, next) => {
+    private handleError: ErrorRequestHandler = (error, req, res, _next) => {
         Logger.error(
             Logs.error.processRequest
                 .replace('{HTTP_METHOD}', req.method)
