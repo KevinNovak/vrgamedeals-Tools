@@ -22,7 +22,7 @@ export class Logger {
         }
 
         switch (error.constructor) {
-            case Response:
+            case Response: {
                 let res = error as Response;
                 let resText: string;
                 try {
@@ -38,9 +38,11 @@ export class Logger {
                     body: resText,
                 });
                 break;
-            default:
+            }
+            default: {
                 console.error(error);
                 break;
+            }
         }
     }
 }
