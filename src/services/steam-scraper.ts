@@ -8,8 +8,8 @@ import {
     GameElementData,
     ReviewData,
     SearchAppPageData,
-} from '../models/internal-models';
-import { RegexUtils, StringUtils } from '../utils';
+} from '../models/internal-models.js';
+import { RegexUtils, StringUtils } from '../utils/index.js';
 
 export class SteamScraper {
     public getAppPageData(appPageHtml: string): AppPageData {

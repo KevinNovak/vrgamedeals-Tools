@@ -8,7 +8,10 @@
     "engines": {
         "node": ">=12.14.0"
     },
-    "main": "dist/start.js",
+    "type": "module",
+    "exports": [
+        "./dist/start.js"
+    ],
     "scripts": {
         "lint": "tslint --project .",
         "lint:fix": "tslint --fix --project .",
@@ -16,7 +19,7 @@
         "format:fix": "prettier --write .",
         "clean": "git clean -xdf --exclude=\"/config/**/*\"",
         "clean:dry": "git clean -xdf --exclude=\"/config/**/*\" --dry-run",
-        "build": "tsc",
+        "build": "tsc --project tsconfig.json",
         "postinstall": "npm run build",
         "start": "node --enable-source-maps dist/start.js",
         "start:pm2": "npm run pm2:start",

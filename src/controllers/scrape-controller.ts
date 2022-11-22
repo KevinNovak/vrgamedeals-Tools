@@ -1,8 +1,8 @@
 import { Request, Response, Router } from 'express';
 import router from 'express-promise-router';
 
-import { HttpService, SteamScraper } from '../services';
-import { Controller } from './controller';
+import { HttpService, SteamScraper } from '../services/index.js';
+import { Controller } from './controller.js';
 
 export class ScrapeController implements Controller {
     public path = '/';

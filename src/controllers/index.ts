@@ -1,3 +1,3 @@
-export { Controller } from './controller';
-export { RootController } from './root-controller';
-export { ScrapeController } from './scrape-controller';
+export { Controller } from './controller.js';
+export { RootController } from './root-controller.js';
+export { ScrapeController } from './scrape-controller.js';
