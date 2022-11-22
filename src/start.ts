@@ -16,7 +16,7 @@ async function start(): Promise<void> {
     await api.start();
 }
 
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason, _promise) => {
     Logger.error('Unhandled promise rejection.', reason);
 });
 
