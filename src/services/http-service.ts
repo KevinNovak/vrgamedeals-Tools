@@ -14,7 +14,7 @@ export class HttpService {
             throw res;
         }
 
-        return res.text();
+        return await res.text();
     }
 
     public async post(url: string | URL, body?: object): Promise<string> {
@@ -31,7 +31,7 @@ export class HttpService {
             throw res;
         }
 
-        return res.text();
+        return await res.text();
     }
 
     public async put(url: string | URL, body?: object): Promise<string> {
@@ -48,7 +48,7 @@ export class HttpService {
             throw res;
         }
 
-        return res.text();
+        return await res.text();
     }
 
     public async delete(url: string | URL, body?: object): Promise<string> {
@@ -65,6 +65,6 @@ export class HttpService {
             throw res;
         }
 
-        return res.text();
+        return await res.text();
     }
 }

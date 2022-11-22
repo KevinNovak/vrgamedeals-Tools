@@ -1,6 +1,5 @@
 import { Api } from './api.js';
 import { RootController, ScrapeController } from './controllers/index.js';
-
 import { HttpService, Logger, SteamScraper } from './services/index.js';
 
 async function start(): Promise<void> {
