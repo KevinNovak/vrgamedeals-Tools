@@ -1,8 +1,10 @@
 import express, { ErrorRequestHandler, Express } from 'express';
+import { createRequire } from 'node:module';
 
-import { Controller } from './controllers';
-import { Logger } from './services';
+import { Controller } from './controllers/index.js';
+import { Logger } from './services/index.js';
 
+const require = createRequire(import.meta.url);
 let Config = require('../config/config.json');
 let Logs = require('../lang/logs.json');
 
@@ -31,7 +33,7 @@ export class Api {
         }
     }
 
-    private handleError: ErrorRequestHandler = (error, req, res, next) => {
+    private handleError: ErrorRequestHandler = (error, req, res, _next) => {
         Logger.error(
             Logs.error.processRequest
                 .replace('{HTTP_METHOD}', req.method)

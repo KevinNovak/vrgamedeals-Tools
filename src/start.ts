@@ -1,7 +1,6 @@
-import { Api } from './api';
-import { RootController, ScrapeController } from './controllers';
-
-import { HttpService, Logger, SteamScraper } from './services';
+import { Api } from './api.js';
+import { RootController, ScrapeController } from './controllers/index.js';
+import { HttpService, Logger, SteamScraper } from './services/index.js';
 
 async function start(): Promise<void> {
     // Services
@@ -17,8 +16,10 @@ async function start(): Promise<void> {
     await api.start();
 }
 
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason, _promise) => {
     Logger.error('Unhandled promise rejection.', reason);
 });
 
-start();
+start().catch(error => {
+    Logger.error('An unspecified error occurred.', error);
+});

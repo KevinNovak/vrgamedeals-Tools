@@ -1,2 +1,2 @@
-export { RegexUtils } from './regex-utils';
-export { StringUtils } from './string-utils';
+export { RegexUtils } from './regex-utils.js';
+export { StringUtils } from './string-utils.js';

@@ -1,4 +1,5 @@
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
+import { Element } from 'cheerio';
 
 import {
     AppPageData,
@@ -7,8 +8,8 @@ import {
     GameElementData,
     ReviewData,
     SearchAppPageData,
-} from '../models/internal-models';
-import { RegexUtils, StringUtils } from '../utils';
+} from '../models/internal-models.js';
+import { RegexUtils, StringUtils } from '../utils/index.js';
 
 export class SteamScraper {
     public getAppPageData(appPageHtml: string): AppPageData {
@@ -67,7 +68,7 @@ export class SteamScraper {
         };
     }
 
-    private getMainGameElement(appPageHtml: string): cheerio.Element {
+    private getMainGameElement(appPageHtml: string): Element {
         let $ = cheerio.load(appPageHtml);
 
         let gameElements = Array.from(
@@ -123,7 +124,7 @@ export class SteamScraper {
 
         let reviewsTooltip = $('div.user_reviews_summary_bar span.game_review_summary')
             .first()
-            .data('tooltip-html');
+            .data('tooltip-html') as string;
 
         if (reviewsTooltip) {
             reviewsTooltip = reviewsTooltip.trim();
@@ -133,7 +134,7 @@ export class SteamScraper {
         return reviewData;
     }
 
-    private getGameDataFromSearchResult(searchResult: cheerio.Element): GameData {
+    private getGameDataFromSearchResult(searchResult: Element): GameData {
         let $ = cheerio.load(searchResult);
 
         let gameData: GameData = {
@@ -181,7 +182,7 @@ export class SteamScraper {
         if (gameData.type === 'APP') {
             let reviewsTooltip: string = $(
                 'div.search_reviewscore > span.search_review_summary'
-            ).data('tooltip-html');
+            ).data('tooltip-html') as string;
 
             if (reviewsTooltip) {
                 reviewsTooltip = reviewsTooltip.trim();
@@ -212,7 +213,7 @@ export class SteamScraper {
         return reviewData;
     }
 
-    private getGameDataFromGameElement(gameElement: cheerio.Element): GameElementData {
+    private getGameDataFromGameElement(gameElement: Element): GameElementData {
         let $ = cheerio.load(gameElement);
 
         let gameData: GameElementData = {
@@ -241,7 +242,7 @@ export class SteamScraper {
         return gameData;
     }
 
-    private getCountdownFromGameElement(gameElement: cheerio.Element): CountdownData {
+    private getCountdownFromGameElement(gameElement: Element): CountdownData {
         let $ = cheerio.load(gameElement);
 
         let countdownData: CountdownData = {
@@ -258,21 +259,22 @@ export class SteamScraper {
             // Ignore
         }
 
-        try {
-            let countdownScript = $('.game_area_purchase_game > script')[0].children[0].data;
-            let countdownTimeText = RegexUtils.extractDiscountCountdown(countdownScript);
-            let time = parseInt(countdownTimeText);
-            if (time) {
-                countdownData.time = time;
-            }
-        } catch {
-            // Ignore
-        }
+        // TODO: Fix
+        // try {
+        //     let countdownScript = $('.game_area_purchase_game > script')[0].children[0];
+        //     let countdownTimeText = RegexUtils.extractDiscountCountdown(countdownScript);
+        //     let time = parseInt(countdownTimeText);
+        //     if (time) {
+        //         countdownData.time = time;
+        //     }
+        // } catch {
+        //     // Ignore
+        // }
 
         return countdownData;
     }
 
-    private getVrSupportFromGameElement(gameElement: cheerio.Element): string {
+    private getVrSupportFromGameElement(gameElement: Element): string {
         let $ = cheerio.load(gameElement);
 
         let vrSupport = 'NONE';
