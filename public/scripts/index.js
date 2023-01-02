@@ -10,45 +10,6 @@ const MAX_RETRIES = 10;
 
 const BUNDLE_PREFIX = '**Bundle** - ';
 
-const HEADSET_ALIASES = {
-    'Valve Index': {
-        shortName: 'Index',
-        abbreviation: 'I',
-    },
-    'HTC Vive': {
-        shortName: 'Vive',
-        abbreviation: 'V',
-    },
-    'Oculus Rift': {
-        shortName: 'Rift',
-        abbreviation: 'R',
-    },
-    'Oculus Rift DK2': {
-        shortName: 'Rift DK2',
-        abbreviation: 'DK2',
-    },
-    'Windows Mixed Reality': {
-        shortName: 'WMR',
-        abbreviation: 'W',
-    },
-    RIFT: {
-        shortName: 'Rift',
-        abbreviation: 'R',
-    },
-    LAGUNA: {
-        shortName: 'Rift',
-        abbreviation: 'R',
-    },
-    MONTEREY: {
-        shortName: 'Quest',
-        abbreviation: 'Q',
-    },
-    PACIFIC: {
-        shortName: 'Go',
-        abbreviation: 'G',
-    },
-};
-
 // Steam App Titler
 let steamAppBtn = document.getElementById('steam-app-btn');
 let steamAppUrlInput = document.getElementById('steam-app-url-input');
@@ -100,11 +61,7 @@ async function retrieveSteamAppTitle() {
     try {
         let appData = await post('./api/steam/app-scrape', content, MAX_RETRIES);
 
-        let text = '';
-        if (appData.headsets.length > 0) {
-            let platforms = getPlatformText(appData.headsets);
-            text += `[${platforms}] `;
-        }
+        let text = '[SteamVR] ';
         text += `${appData.title} `;
         let priceTag = appData.percentOff
             ? `(${appData.price} / -${appData.percentOff})`
@@ -178,11 +135,9 @@ async function retrieveSteamSearchTable() {
                 };
 
                 let appData = await post('./api/steam/search-app-scrape', content, MAX_RETRIES);
-                app.headsets = appData.headsets || [];
                 app.countdown = appData.countdown || { text: '', time: 0 };
                 app.vrSupport = appData.vrSupport || '';
             } else {
-                app.headsets = [];
                 app.countdown = {
                     text: '',
                     time: 0,
@@ -234,8 +189,6 @@ function formatAppData(app) {
     let formattedData = {
         type: '',
         vrSupport: '',
-        platform: '',
-        platformAbbreviated: '',
         title: '',
         titleLink: '',
         link: '',
@@ -250,10 +203,6 @@ function formatAppData(app) {
 
     formattedData.type = app.type;
     formattedData.vrSupport = app.vrSupport;
-    formattedData.platform = app.headsets.join(', ');
-    formattedData.platformAbbreviated = app.headsets
-        .map(platform => getHeadsetAbbreviation(platform))
-        .join('/');
     formattedData.title = app.title;
 
     let titlePrefix = app.type == 'BUNDLE' ? BUNDLE_PREFIX : '';
@@ -282,8 +231,8 @@ async function retrieveSearchPageData(steamSearchUrl, pageNumber) {
 }
 
 function createMarkdownTable(formattedSearchData) {
-    let header = '| Platform | Title | Price (USD) | Discount (%) | Rating (%) | Review Count |';
-    let divider = '| :- | :- | -: | -: | -: | -: |';
+    let header = '| Title | Price (USD) | Discount (%) | Rating (%) | Review Count |';
+    let divider = '| :- | -: | -: | -: | -: |';
     let result = header + NEW_LINE + divider + NEW_LINE;
 
     for (let app of formattedSearchData) {
@@ -294,7 +243,7 @@ function createMarkdownTable(formattedSearchData) {
 }
 
 function convertToRow(app) {
-    return `| ${app.platformAbbreviated} | ${app.titleLink} | ${app.price} | ${app.percentOff} | ${app.reviews} | ${app.reviewsCount} |`;
+    return `| ${app.titleLink} | ${app.price} | ${app.percentOff} | ${app.reviews} | ${app.reviewsCount} |`;
 }
 
 async function post(url, content, maxAttempts) {
@@ -335,31 +284,6 @@ function extractNumberFromPercent(input) {
     let match = PERCENT_NUMBER_REGEX.exec(input);
     if (match) {
         return match[1];
-    }
-}
-
-function getPlatformText(platforms) {
-    if (platforms.length == 1) {
-        return getHeadsetShortName(platforms[0]);
-    }
-    return platforms.map(platform => getHeadsetAbbreviation(platform)).join('/');
-}
-
-function getHeadsetShortName(headsetName) {
-    let headsetAlias = HEADSET_ALIASES[headsetName];
-    if (headsetAlias) {
-        return headsetAlias.shortName;
-    } else {
-        return headsetName;
-    }
-}
-
-function getHeadsetAbbreviation(headsetName) {
-    let headsetAlias = HEADSET_ALIASES[headsetName];
-    if (headsetAlias) {
-        return headsetAlias.abbreviation;
-    } else {
-        return headsetName;
     }
 }
 

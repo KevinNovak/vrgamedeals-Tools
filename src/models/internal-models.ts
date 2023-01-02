@@ -7,14 +7,12 @@ export interface AppPageData {
     reviewsCount: string;
     countdown: CountdownData;
     vrSupport: string;
-    headsets: string[];
     link: string;
 }
 
 export interface SearchAppPageData {
     countdown: CountdownData;
     vrSupport: string;
-    headsets: string[];
 }
 
 export interface GameData {

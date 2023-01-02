@@ -22,7 +22,6 @@ export class SteamScraper {
         let gameData = this.getGameDataFromGameElement(firstGame);
         let countdown = this.getCountdownFromGameElement(firstGame);
         let vrSupport = this.getVrSupportFromGameElement(firstGame);
-        let headsets = this.getHeadsets(appPageHtml);
         let reviews = this.getReviews(appPageHtml);
 
         return {
@@ -31,7 +30,6 @@ export class SteamScraper {
             ...reviews,
             countdown,
             vrSupport,
-            headsets,
             link: undefined,
         };
     }
@@ -59,12 +57,10 @@ export class SteamScraper {
 
         let countdown = this.getCountdownFromGameElement(firstGame);
         let vrSupport = this.getVrSupportFromGameElement(firstGame);
-        let headsets = this.getHeadsets(appPageHtml);
 
         return {
             countdown,
             vrSupport,
-            headsets,
         };
     }
 
@@ -94,24 +90,6 @@ export class SteamScraper {
         }
 
         return title;
-    }
-
-    private getHeadsets(appPageHtml: string): string[] {
-        let $ = cheerio.load(appPageHtml);
-
-        let headsetTitleElement = $('.details_block.vrsupport > div:contains("Headsets")').parent();
-        let headsetElements = Array.from(headsetTitleElement.nextUntil('.details_block'));
-
-        let headsets: string[] = [];
-
-        for (let headsetElement of headsetElements) {
-            let headsetName = $('.label', headsetElement).text().trim();
-            if (headsetName) {
-                headsets.push(headsetName);
-            }
-        }
-
-        return headsets;
     }
 
     private getReviews(appPageHtml: string): ReviewData {
