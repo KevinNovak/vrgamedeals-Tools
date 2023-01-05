@@ -1,5 +1,7 @@
 import * as cheerio from 'cheerio';
 import { Element } from 'cheerio';
+import chrono from 'chrono-node';
+import { DateTime } from 'luxon';
 
 import {
     AppPageData,
@@ -23,11 +25,13 @@ export class SteamScraper {
         let countdown = this.getCountdownFromGameElement(firstGame);
         let vrSupport = this.getVrSupportFromGameElement(firstGame);
         let reviews = this.getReviews(appPageHtml);
+        let releaseDate = this.getReleaseDate(appPageHtml);
 
         return {
             title,
             ...gameData,
             ...reviews,
+            releaseDate,
             countdown,
             vrSupport,
             link: undefined,
@@ -92,6 +96,29 @@ export class SteamScraper {
         return title;
     }
 
+    private getReleaseDate(appPageHtml: string): string {
+        let $ = cheerio.load(appPageHtml);
+
+        let releaseDate = '';
+
+        let gameDetailsElement = $(
+            '.game_details .details_block:contains("Release Date:")'
+        ).first();
+
+        if (gameDetailsElement) {
+            let gameDetailsContent = gameDetailsElement.html().trim();
+            let releaseDateText = RegexUtils.extractReleaseDate(gameDetailsContent);
+            if (releaseDateText) {
+                let releaseJsDate = chrono.parseDate(releaseDateText);
+                if (releaseJsDate) {
+                    releaseDate = DateTime.fromJSDate(releaseJsDate).toFormat('yyyy-MM-dd');
+                }
+            }
+        }
+
+        return releaseDate;
+    }
+
     private getReviews(appPageHtml: string): ReviewData {
         let $ = cheerio.load(appPageHtml);
 
@@ -124,6 +151,7 @@ export class SteamScraper {
             percentOff: '',
             reviewsPercent: '',
             reviewsCount: '',
+            releaseDate: '',
         };
 
         let title = $('div.search_name > span.title').text().trim();
@@ -167,6 +195,14 @@ export class SteamScraper {
                 let reviewData = this.extractReviewDataFromTooltip(reviewsTooltip);
                 gameData.reviewsPercent = reviewData.reviewsPercent;
                 gameData.reviewsCount = reviewData.reviewsCount;
+            }
+        }
+
+        let releaseDateText = $('div.search_released').text().trim();
+        if (releaseDateText) {
+            let releaseJsDate = chrono.parseDate(releaseDateText);
+            if (releaseJsDate) {
+                gameData.releaseDate = DateTime.fromJSDate(releaseJsDate).toFormat('yyyy-MM-dd');
             }
         }
 

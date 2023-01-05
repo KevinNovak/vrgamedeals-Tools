@@ -5,6 +5,7 @@ export interface AppPageData {
     percentOff: string;
     reviewsPercent: string;
     reviewsCount: string;
+    releaseDate: string;
     countdown: CountdownData;
     vrSupport: string;
     link: string;
@@ -24,6 +25,7 @@ export interface GameData {
     percentOff: string;
     reviewsPercent: string;
     reviewsCount: string;
+    releaseDate: string;
 }
 
 export interface GameElementData {

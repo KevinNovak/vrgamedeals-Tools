@@ -1,4 +1,5 @@
 const TITLE_REGEX = /<b>Title:<\/b>(.*)<br>/;
+const RELEASE_DATE_REGEX = /<b>Release Date:<\/b>(.*)<br>/;
 const PERCENT_REGEX = /(\d+%)/;
 const REVIEWS_COUNT_REGEX = /([\d,]+) user review/;
 const DISCOUNT_COUNTDOWN_REGEX = /DiscountCountdown,[ ]*([\d]{7,})/;
@@ -6,6 +7,13 @@ const DISCOUNT_COUNTDOWN_REGEX = /DiscountCountdown,[ ]*([\d]{7,})/;
 export abstract class RegexUtils {
     public static extractTitle(input: string): string {
         let match = TITLE_REGEX.exec(input);
+        if (match) {
+            return match[1].trim();
+        }
+    }
+
+    public static extractReleaseDate(input: string): string {
+        let match = RELEASE_DATE_REGEX.exec(input);
         if (match) {
             return match[1].trim();
         }

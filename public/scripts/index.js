@@ -199,6 +199,7 @@ function formatAppData(app) {
         countdownTime: 0,
         reviews: '',
         reviewsCount: '',
+        releaseDate: '',
     };
 
     formattedData.type = app.type;
@@ -216,6 +217,7 @@ function formatAppData(app) {
     formattedData.countdownTime = app.countdown.time;
     formattedData.reviews = extractNumberFromPercent(app.reviewsPercent) || app.reviewsPercent;
     formattedData.reviewsCount = app.reviewsCount;
+    formattedData.releaseDate = app.releaseDate;
 
     return formattedData;
 }
@@ -231,8 +233,8 @@ async function retrieveSearchPageData(steamSearchUrl, pageNumber) {
 }
 
 function createMarkdownTable(formattedSearchData) {
-    let header = '| Title | Price (USD) | Discount (%) | Rating (%) | Review Count |';
-    let divider = '| :- | -: | -: | -: | -: |';
+    let header = '| Title | Price (USD) | Discount (%) | Rating (%) | Total Reviews | Release Date |';
+    let divider = '| :- | -: | -: | -: | -: | :- |';
     let result = header + NEW_LINE + divider + NEW_LINE;
 
     for (let app of formattedSearchData) {
@@ -243,7 +245,7 @@ function createMarkdownTable(formattedSearchData) {
 }
 
 function convertToRow(app) {
-    return `| ${app.titleLink} | ${app.price} | ${app.percentOff} | ${app.reviews} | ${app.reviewsCount} |`;
+    return `| ${app.titleLink} | ${app.price} | ${app.percentOff} | ${app.reviews} | ${app.reviewsCount} | ${app.releaseDate} |`;
 }
 
 async function post(url, content, maxAttempts) {
