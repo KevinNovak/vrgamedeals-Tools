@@ -21,8 +21,8 @@
         "clean:dry": "git clean -xdf --exclude=\"/config/**/*\" --dry-run",
         "build": "tsc --project tsconfig.json",
         "postinstall": "npm run build",
-        "start": "node --enable-source-maps dist/start.js",
-        "start:pm2": "npm run pm2:start",
+        "start": "npm run build && node --enable-source-maps dist/start.js",
+        "start:pm2": "npm run build && npm run pm2:start",
         "pm2:start": "pm2 start process.json",
         "pm2:stop": "pm2 stop process.json",
         "pm2:delete": "pm2 delete process.json"
