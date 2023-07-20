@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 import { Element } from 'cheerio';
-import chrono from 'chrono-node';
+import * as chrono from 'chrono-node';
 import { DateTime } from 'luxon';
 
 import {
