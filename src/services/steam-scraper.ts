@@ -170,17 +170,17 @@ export class SteamScraper {
             gameData.type = 'BUNDLE';
         }
 
-        let price = $('div.search_price').clone().children().remove().end().text().trim();
+        let price = $('div.discount_final_price').text().trim();
         if (price) {
             gameData.price = price;
         }
 
-        let originalPrice = $('div.search_price > span > strike').text().trim();
+        let originalPrice = $('div.discount_original_price').text().trim();
         if (originalPrice) {
             gameData.originalPrice = originalPrice;
         }
 
-        let percentOff = RegexUtils.extractPercent($('div.search_discount > span').text().trim());
+        let percentOff = RegexUtils.extractPercent($('div.discount_pct').text().trim());
         if (percentOff) {
             gameData.percentOff = percentOff;
         }
